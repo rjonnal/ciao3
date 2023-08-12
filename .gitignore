@@ -1,0 +1,22 @@
+# Compiled source #
+###################
+*.pyc
+__pycache__/
+
+# Logs and databases #
+######################
+*.log
+.simulator_cache/
+.gui_settings/
+log/
+*.npy
+*.mat
+*.wav
+
+# Local sessions #
+##################
+local_session_*/
+
+# Obsolete files #
+##################
+obs/
