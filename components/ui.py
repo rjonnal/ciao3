@@ -172,12 +172,14 @@ class StripChart(QWidget):
         temp = self.scale_y(np.array(list(self.buf[self.buffer_current_index:])+list(self.buf[:self.buffer_current_index])))
 
         for yt in self.yticks:
-            self.painter.drawLine(QLine(0,self.scale_y(yt),self.buffer_length*self.xscale,self.scale_y(yt)))
+            if True:#qlfix
+                self.painter.drawLine(QLine(0,self.scale_y(yt),self.buffer_length*self.xscale,self.scale_y(yt)))
 
 
         self.painter.setPen(self.hline_pen)
         for hline in self.hlines:
-            self.painter.drawLine(QLine(0,self.scale_y(hline),self.buffer_length*self.xscale,self.scale_y(hline)))
+            if True:#qlfix
+                self.painter.drawLine(QLine(0,self.scale_y(hline),self.buffer_length*self.xscale,self.scale_y(hline)))
 
 
         self.painter.setPen(self.pen)
@@ -187,18 +189,21 @@ class StripChart(QWidget):
             x2 = (idx+1)*self.xscale
             y1 = temp[idx]
             y2 = temp[idx+1]
-            
-            self.painter.drawLine(QLine(x1,y1,x2,y2))
+
+            if True:#qlfix:
+                self.painter.drawLine(QLine(x1,y1,x2,y2))
 
             interval = self.buffer_length//10
             interval = ccfg.plot_xtick_interval
             if idx%interval==0:
                 self.painter.setPen(self.xtick_pen)
-                self.painter.drawLine(QLine(
-                    int(x1-self.buffer_current_index*self.xscale)%(self.buffer_length*self.xscale),
-                    self.xtick0,
-                    int(x1-self.buffer_current_index*self.xscale)%(self.buffer_length*self.xscale),
-                    self.xtick1))
+
+                if True:#qlfix
+                    self.painter.drawLine(QLine(
+                        int(x1-self.buffer_current_index*self.xscale)%(self.buffer_length*self.xscale),
+                        self.xtick0,
+                        int(x1-self.buffer_current_index*self.xscale)%(self.buffer_length*self.xscale),
+                        self.xtick1))
                 self.painter.setPen(self.pen)
             
             #if True:#20<self.buffer_current_index<80:
@@ -250,7 +255,7 @@ class Overlay(QWidget):
         if active is None:
             active=self.active
             
-        d = float(downsample)
+        d = int(downsample)
         if not self.visible:
             return
         if self.mode=='lines':
@@ -259,7 +264,8 @@ class Overlay(QWidget):
             painter.setPen(self.pen)
             for index,(x1,x2,y1,y2) in enumerate(self.coords):
                 if active[index]:
-                    painter.drawLine(QLine(x1/d,y1/d,x2/d,y2/d))
+                    if True:#qlfix
+                        painter.drawLine(QLine(int(x1)//d,int(y1)//d,int(x2)//d,int(y2)//d))
             painter.end()
         elif self.mode=='rects':
             painter = QPainter()
@@ -430,7 +436,7 @@ class ZoomDisplay(QWidget):
             self.sized = True
         try:
             cmin,cmax = self.display_clim
-            bmp = np.round(np.clip((data.astype(np.float)-cmin)/(cmax-cmin+eps),0,1)*255).astype(np.uint8)
+            bmp = np.round(np.clip((data.astype(float)-cmin)/(cmax-cmin+eps),0,1)*255).astype(np.uint8)
             self.sy,self.sx = bmp.shape
             n_bytes = bmp.nbytes
             bytes_per_line = int(n_bytes/self.sy)

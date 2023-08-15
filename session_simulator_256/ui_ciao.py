@@ -1,26 +1,28 @@
 import sys,os
 sys.path.append(os.path.split(__file__)[0])
-import ciao3
 import ciao_config as ccfg
 from matplotlib import pyplot as plt
 import numpy as np
 from PyQt5.QtWidgets import QApplication
-
-
-
+from ciao3.components.simulator import Simulator
+from ciao3.components.sensors import Sensor
+from ciao3.components.loops import Loop
+from ciao3.components import cameras
+from ciao3.components.mirrors import Mirror
+from ciao3.components.ui import UI
 
 if ccfg.simulate:
-    sim = ciao3.simulator.Simulator()
-    sensor = ciao3.sensors.Sensor(sim)
+    sim = Simulator()
+    sensor = Sensor(sim)
     mirror = sim
 else:
-    cam = ciao3.cameras.get_camera()
-    mirror = ciao3.mirrors.Mirror()
-    sensor = ciao3.sensors.Sensor(cam)
+    cam = cameras.get_camera()
+    mirror = Mirror()
+    sensor = Sensor(cam)
     
 app = QApplication(sys.argv)
-loop = ciao3.loops.Loop(sensor,mirror)
-ui = ciao3.ui.UI(loop)
+loop = Loop(sensor,mirror)
+ui = UI(loop)
 loop.start()
 sys.exit(app.exec_())
 

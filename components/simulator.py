@@ -66,8 +66,8 @@ class Simulator:
         self.disc = np.zeros((self.sy,self.sx))
         self.disc[np.where(d<=self.disc_diameter)] = 1.0
         
-        self.X = np.arange(self.sx,dtype=np.float)*self.pixel_size_m
-        self.Y = np.arange(self.sy,dtype=np.float)*self.pixel_size_m
+        self.X = np.arange(self.sx,dtype=float)*self.pixel_size_m
+        self.Y = np.arange(self.sy,dtype=float)*self.pixel_size_m
         self.X = self.X-self.X.mean()
         self.Y = self.Y-self.Y.mean()
         

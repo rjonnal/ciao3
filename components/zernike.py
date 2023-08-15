@@ -41,7 +41,7 @@ class Zernike:
     def j2nm(self,j):
         n = np.ceil((-3+np.sqrt(9+8*j))/2)
         m = 2*j-n*(n+2)
-        return np.int(n),np.int(m)
+        return int(n),int(m)
 
     def nm2j(self,n,m):
         return np.int(n*(n+1)/2.0+(n+m)/2.0)
