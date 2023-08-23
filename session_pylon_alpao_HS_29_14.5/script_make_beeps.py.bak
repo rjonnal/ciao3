@@ -55,14 +55,14 @@ def save_wav(file_name,buf):
 try:
     os.mkdir(ccfg.audio_directory)
 except Exception as e:
-    print(e)
+    print e
 
 # use middle C scale for basis, and then multipliers (0.125, 0.25, 0.5, 1.0, 2.0, 4.0) for different octaves
 
 octave_multipliers = [0.125, 0.25, 0.5, 1.0, 2.0, 4.0]
 octave_subscripts = [1,2,3,4,5,6]
 
-octaves = dict(list(zip(octave_subscripts,octave_multipliers)))
+octaves = dict(zip(octave_subscripts,octave_multipliers))
     
 notes = ['C','C_sharp','D','D_sharp','E','F','F_sharp','G','G_sharp','A','A_sharp','B']
 freqs = [261.63,277.18,293.66,311.13,329.63,349.23,369.99,392,415.3,440,466.16,493.88]
@@ -74,4 +74,4 @@ for subscript in octave_subscripts:
         fn = os.path.join(ccfg.audio_directory,'%s_%d.wav'%(n,subscript))
         tone = make_sinewave(freq=f*multiplier)
         save_wav(fn,tone)
-        print('Writing tone w/ frequency %0.1f to %s'%(f,fn))
+        print 'Writing tone w/ frequency %0.1f to %s'%(f,fn)

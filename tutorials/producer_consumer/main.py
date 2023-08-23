@@ -12,9 +12,6 @@ logging.basicConfig(level=logging.DEBUG,
 BUF_SIZE = 10
 N = 256
 
-
-
-
 class ProducerThread(threading.Thread):
     def __init__(self, q, group=None, target=None, name=None,
                  args=(), kwargs=None, verbose=None):

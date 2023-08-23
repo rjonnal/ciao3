@@ -9,14 +9,14 @@ from ciao import tools
 # Call this with 'python record_reference_coordinages.py output_filename.txt'
 
 if len(sys.argv)<2:
-    print "Call this with 'python record_reference_coordinages.py output_filename.txt,"
-    print "  where output_filename.txt is the file in which the reference coordinates are saved."
+    print("Call this with 'python record_reference_coordinages.py output_filename.txt,")
+    print("  where output_filename.txt is the file in which the reference coordinates are saved.")
     sys.exit()
     
 try:
     N = int(ccfg.reference_n_measurements)
 except Exception as e:
-    print e
+    print(e)
     N = 1
 
 if ccfg.simulate:
@@ -109,7 +109,7 @@ while True:
     plt.imshow(im,cmap='gray')
     plt.plot(ref_xy[:,0],ref_xy[:,1],'rx')
     plt.pause(.1)
-    answer = raw_input('%s\n%s\n%s\n%s\n'%(m1x,m2x,m3,m4))
+    answer = input('%s\n%s\n%s\n%s\n'%(m1x,m2x,m3,m4))
     if answer=='0':
         break
     elif answer.find('.')>-1:
@@ -125,7 +125,7 @@ while True:
     plt.imshow(im,cmap='gray')
     plt.plot(ref_xy[:,0],ref_xy[:,1],'rx')
     plt.pause(.1)
-    answer = raw_input('%s\n%s\n%s\n%s\n'%(m1y,m2y,m3,m4))
+    answer = input('%s\n%s\n%s\n%s\n'%(m1y,m2y,m3,m4))
     if answer=='0':
         break
     elif answer.find('.')>-1:
