@@ -64,7 +64,9 @@ class MirrorControllerCtypes(MirrorController):
         
 class MirrorControllerPython(MirrorController):
     def __init__(self):
+        print(sys.path)
         sys.path.append(os.path.dirname(__file__))
+        print(sys.path)
         from .asdk import DM
         super(MirrorControllerPython,self).__init__()        
         self.mirror_id = ccfg.mirror_id
