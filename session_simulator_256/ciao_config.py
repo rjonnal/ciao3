@@ -18,8 +18,8 @@ mirror_id = 'HSDM97-15-010'
 camera_id = 'pylon'
 
 import os # 
-image_width_px = 256
-image_height_px = 256
+image_width_px = 300
+image_height_px = 300
 bit_depth = 12
 
 ciao_session = '.'

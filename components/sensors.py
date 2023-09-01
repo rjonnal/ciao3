@@ -2,6 +2,7 @@ import numpy as np
 import time
 from ciao3.components import centroid
 import sys
+
 from PyQt5.QtCore import (QThread, QTimer, pyqtSignal, Qt, QPoint, QLine,
                           QMutex, QObject, pyqtSlot)
 
@@ -461,7 +462,8 @@ class Sensor:
             print(e)
             print(self.error)
             sys.exit()
-        
+
+
     def record_reference(self):
         print('recording reference')
         self.pause()

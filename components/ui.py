@@ -600,8 +600,10 @@ class UI(QWidget):
         
         self.pb_poke = QPushButton('Measure poke matrix')
         self.pb_poke.clicked.connect(self.loop.run_poke)
+
         self.pb_record_reference = QPushButton('Record reference')
         self.pb_record_reference.clicked.connect(self.loop.sensor.record_reference)
+
         self.pb_reload_reference = QPushButton('Reload reference')
         self.pb_reload_reference.clicked.connect(self.loop.sensor.reload_reference)
         
@@ -831,6 +833,7 @@ class UI(QWidget):
             
         column_2.addWidget(self.cb_draw_boxes)
         column_2.addWidget(self.cb_draw_lines)
+        column_2.addWidget(self.pb_poke)
         column_2.addWidget(self.pb_quit)
         
         column_2.addWidget(self.stripchart_error)
@@ -851,9 +854,8 @@ class UI(QWidget):
         
         
         
-        column_2.addWidget(self.pb_poke)
-        column_2.addWidget(self.pb_record_reference)
-        column_2.addWidget(self.pb_reload_reference)
+        #column_2.addWidget(self.pb_record_reference)
+        #column_2.addWidget(self.pb_reload_reference)
         
         column_2.addWidget(self.cb_logging)
         

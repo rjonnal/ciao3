@@ -295,8 +295,8 @@ class Loop(QObject):
                         filename = 'spots_%03d_%0.3f.npy'%(k_actuator,cur)
                         image = self.sensor.image
                         np.save(os.path.join(spots_folder,filename),image)
-                except NameError as ne:
-                    print(ne)
+                except AttributeError as ae:
+                    print(ae)
                     pass
                         
                 x_mat[:,k_actuator,k_command] = self.sensor.x_slopes

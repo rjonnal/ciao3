@@ -78,7 +78,7 @@ class ThreadedClient:
             # To simulate asynchronous I/O, we create a random number at
             # random intervals. Replace the following two lines with the real
             # thing.
-            time.sleep(rand.random(  ) * 1.5)
+            time.sleep(rand.random(  ) * 0.5)
             msg = rand.random(  )
             self.queue.put(msg)
 
