@@ -11,7 +11,8 @@ system_id = 'AOSSFFOCT'
 
 # An identifier for the deformable mirror, used to load
 # the correct configuration files:
-mirror_id = 'HSDM97-15-010'
+# mirror_id = 'HSDM97-15-010'
+mirror_id = 'BAX100'
 
 # An identifier for the camera; can be 'ace', 'pylon', or
 # 'simulator'

@@ -64,10 +64,7 @@ class MirrorControllerCtypes(MirrorController):
         
 class MirrorControllerPython(MirrorController):
     def __init__(self):
-        print(sys.path)
-        sys.path.append(os.path.dirname(__file__))
-        print(sys.path)
-        from .asdk import DM
+        from Lib64.asdk import DM
         super(MirrorControllerPython,self).__init__()        
         self.mirror_id = ccfg.mirror_id
         #self.dm = DM(os.path.join(ccfg.dm_directory,self.mirror_id))
@@ -116,24 +113,24 @@ class MirrorControllerPythonOld(MirrorController):
 class Mirror:
     def __init__(self):
         
-        try:
-            self.controller = MirrorControllerPython()
-            print('Mirror python initialization succeeded.')
-        except Exception as e:
-            print('Mirror python initialization failed:',e)
-            try:
-                self.controller = MirrorControllerPythonOld()
-                print('Mirror python (old style) initialization succeeded.')
-            except Exception as e:
-                print('Mirror python (old style) initialization failed:',e)
-                try:
-                    self.controller = MirrorControllerCtypes()
-                    print('Mirror c initialization succeeded.')
-                except Exception as e:
-                    print(e)
-                    print('No mirror driver found. Using virtual mirror.')
-                    self.controller = MirrorController()
-            
+        # try:
+        #     self.controller = MirrorControllerPython()
+        #     print('Mirror python initialization succeeded.')
+        # except Exception as e:
+        #     print('Mirror python initialization failed:',e)
+        #     try:
+        #         self.controller = MirrorControllerPythonOld()
+        #         print('Mirror python (old style) initialization succeeded.')
+        #     except Exception as e:
+        #         print('Mirror python (old style) initialization failed:',e)
+        #         try:
+        #             self.controller = MirrorControllerCtypes()
+        #             print('Mirror c initialization succeeded.')
+        #         except Exception as e:
+        #             print(e)
+        #             print('No mirror driver found. Using virtual mirror.')
+        #             self.controller = MirrorController()
+        self.controller = MirrorControllerPython()
         self.mirror_mask = np.loadtxt(ccfg.mirror_mask_filename)
         self.n_actuators = ccfg.mirror_n_actuators
         self.flat = np.loadtxt(ccfg.mirror_flat_filename)
