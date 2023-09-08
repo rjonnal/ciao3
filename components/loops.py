@@ -276,11 +276,12 @@ class Loop(QObject):
         x_mat = np.zeros((n_lenslets,n_actuators,n_commands))
         y_mat = np.zeros((n_lenslets,n_actuators,n_commands))
         ns = now_string()
+        flat = self.mirror.flat
         
         for k_actuator in range(n_actuators):
             self.mirror.flatten()
             for k_command in range(n_commands):
-                cur = commands[k_command]
+                cur = commands[k_command]+flat[k_actuator]
                 #print k_actuator,cur
                 self.mirror.set_actuator(k_actuator,cur)
                 #print k_actuator,k_command

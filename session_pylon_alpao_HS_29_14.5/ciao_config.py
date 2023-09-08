@@ -164,7 +164,7 @@ plot_buffer_length = 100
 
 
 spots_image_downsampling = 4
-search_box_color = (0,63,127,200)
+search_box_color = (63,100,157,200)
 search_box_thickness = 0.2
 show_search_boxes = True
 show_slope_lines = False
