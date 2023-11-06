@@ -982,6 +982,8 @@ class MirrorUI(QWidget):
         self.mirror.set_actuator(idx,val)
         
     def init_UI(self):
+
+        
         self.setWindowIcon(QIcon('./icons/ciao.png'))
         self.setWindowTitle('CIAO Mirror')
         
