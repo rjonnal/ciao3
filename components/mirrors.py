@@ -25,6 +25,7 @@ from .search_boxes import SearchBoxes
 from .reference_generator import ReferenceGenerator
 import ciao_config as ccfg
 from .frame_timer import FrameTimer
+import json
 
 class MirrorController(object):
     def __init__(self):
@@ -143,6 +144,7 @@ class Mirror:
         self.frame_timer = FrameTimer('Mirror',verbose=False)
         self.logging = False
         self.paused = False
+        os.makedirs(ccfg.logging_directory,exist_ok=True)
         
     def update(self):
         if not self.paused:
@@ -185,12 +187,11 @@ class Mirror:
         np.savetxt(os.path.join(ccfg.dm_directory,'custom_flat_%s.txt'%now_string()),self.flat)
         
     def log(self):
-        #outfn = os.path.join(ccfg.logging_directory,'mirror_%s.mat'%(now_string(True)))
-        #d = {}
-        #d['command'] = self.controller.command
-        #sio.savemat(outfn,d)
-        outfn = os.path.join(ccfg.logging_directory,'mirror_%s.txt'%(now_string(True)))
-        np.savetxt(outfn,self.controller.command)
+        now = now_string()
+        d['command'] = [float(a) for a in self.controller.command]
+        with open(os.path.join(ccfg.logging_directory,'mirror_%s.json'%now)):
+            outstr = json.dumps(d)
+            fid.write(outstr)
         
 
     def set_logging(self,val):

@@ -26,6 +26,7 @@ from .search_boxes import SearchBoxes
 import ciao_config as ccfg
 from .frame_timer import FrameTimer,BlockTimer
 from .beeper import Beeper
+import json
 
 class Sensor:
 
@@ -129,6 +130,8 @@ class Sensor:
             self.profile_update_method = ccfg.profile_sensor_update_method
         except:
             self.profile_update_method = False
+
+        os.makedirs(ccfg.logging_directory,exist_ok=True)
         
     def update(self):
         if not self.paused:
@@ -196,63 +199,35 @@ class Sensor:
         self.dark_image[...] = temp[...]
         self.unpause()
 
-    def log0(self):
-        t_string = now_string(True)
-
-        #seconds = float(datetime.datetime.strptime(t_string,'%Y%m%d%H%M%S.%f').strftime('%s.%f'))
-        outfn = os.path.join(ccfg.logging_directory,'sensor_%s.mat'%(t_string))
-        d = {}
-        #d['time_seconds'] = seconds
-        d['x_slopes'] = self.x_slopes
-        d['y_slopes'] = self.y_slopes
-        d['x_centroids'] = self.x_centroids
-        d['y_centroids'] = self.y_centroids
-        d['search_box_x1'] = self.search_boxes.x1
-        d['search_box_x2'] = self.search_boxes.x2
-        d['search_box_y1'] = self.search_boxes.y1
-        d['search_box_y2'] = self.search_boxes.y2
-        d['ref_x'] = self.search_boxes.x
-        d['ref_y'] = self.search_boxes.y
-        d['error'] = np.squeeze(self.error)
-        d['tip'] = self.tip
-        d['tilt'] = self.tilt
-        d['wavefront'] = self.wavefront
-        d['zernikes'] = np.squeeze(self.zernikes)
-        #d['spots_image'] = self.image
-        sio.savemat(outfn,d)
-
     def log(self):
         t_string = now_string(True)
 
-        #seconds = float(datetime.datetime.strptime(t_string,'%Y%m%d%H%M%S.%f').strftime('%s.%f'))
         d = {}
-        #d['time_seconds'] = np.array([seconds])
-        d['x_slopes'] = self.x_slopes
-        d['y_slopes'] = self.y_slopes
-        d['x_centroids'] = self.x_centroids
-        d['y_centroids'] = self.y_centroids
-        d['search_box_x1'] = self.search_boxes.x1
-        d['search_box_x2'] = self.search_boxes.x2
-        d['search_box_y1'] = self.search_boxes.y1
-        d['search_box_y2'] = self.search_boxes.y2
-        d['ref_x'] = self.search_boxes.x
-        d['ref_y'] = self.search_boxes.y
-        d['error'] = np.array([np.squeeze(self.error)])
-        #d['tip'] = self.tip
-        #d['tilt'] = self.tilt
-        d['wavefront'] = self.wavefront
-        d['zernikes'] = np.squeeze(self.zernikes)
-        d['spots_image'] = self.image.astype(np.uint16)
+        now = now_string()
+        d['time'] = now
+        d['x_slopes'] = list(self.x_slopes)
+        d['y_slopes'] = list(self.y_slopes)
+        d['x_centroids'] = list(self.x_centroids)
+        d['y_centroids'] = list(self.y_centroids)
 
-        for k in list(d.keys()):
-            outfn = os.path.join(ccfg.logging_directory,'sensor_%s_%s.txt'%(k,t_string))
-            if k=='spots_image':
-                np.savetxt(outfn,d[k],fmt='%d')
-            else:
-                np.savetxt(outfn,d[k])
-            
+        d['search_box_x1'] = [int(k) for k in self.search_boxes.x1]
+        d['search_box_x2'] = [int(k) for k in self.search_boxes.x2]
+        d['search_box_y1'] = [int(k) for k in self.search_boxes.y1]
+        d['search_box_y2'] = [int(k) for k in self.search_boxes.y2]
         
-        #sio.savemat(outfn,d)
+        d['ref_x'] = list(self.search_boxes.x)
+        d['ref_y'] = list(self.search_boxes.y)
+        d['error'] = self.error
+        d['tip'] = self.tip
+        d['tilt'] = self.tilt
+        d['wavefront'] = [[x for x in row] for row in self.wavefront]
+        d['zernikes'] = list(np.squeeze(self.zernikes))
+
+        with open(os.path.join(ccfg.logging_directory,'sensor_%s.json'%now),'w') as fid:
+            outstr = json.dumps(d)
+            fid.write(outstr)
+
+        np.savetxt(os.path.join(ccfg.logging_directory,'spots_%s.txt'%now),self.image)
 
         
     def set_background_correction(self,val):
