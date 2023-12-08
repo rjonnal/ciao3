@@ -530,6 +530,9 @@ class UI(QWidget):
         self.draw_lines = val
         self.overlay_slopes.visible = val
 
+    def show_mirror_ui(self):
+        mui = MirrorUI(self.loop.mirror)
+        
     def init_UI(self):
         self.setWindowIcon(QIcon('./icons/ciao.png'))
         self.setWindowTitle('CIAO')
@@ -762,6 +765,10 @@ class UI(QWidget):
         self.pb_aberration_reset.clicked.connect(reset)
         aberration_layout.addWidget(self.pb_aberration_reset)
 
+        self.pb_mirror_ui = QPushButton('MirrorUI')
+        self.pb_mirror_ui.clicked.connect(self.show_mirror_ui)
+        aberration_layout.addWidget(self.pb_mirror_ui)
+        
         
         exp_layout = QHBoxLayout()
         exp_layout.addWidget(QLabel('Exposure (us):'))
@@ -982,6 +989,8 @@ class MirrorUI(QWidget):
         self.mirror.set_actuator(idx,val)
         
     def init_UI(self):
+
+        
         self.setWindowIcon(QIcon('./icons/ciao.png'))
         self.setWindowTitle('CIAO Mirror')
         
