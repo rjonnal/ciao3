@@ -607,6 +607,9 @@ class UI(QWidget):
         self.pb_record_reference = QPushButton('Record reference')
         self.pb_record_reference.clicked.connect(self.loop.sensor.record_reference)
 
+        self.pb_pseudocalibrate = QPushButton('Pseudocalibrate')
+        self.pb_pseudocalibrate.clicked.connect(self.loop.sensor.pseudocalibrate)
+        
         self.pb_reload_reference = QPushButton('Reload reference')
         self.pb_reload_reference.clicked.connect(self.loop.sensor.reload_reference)
         
@@ -833,15 +836,25 @@ class UI(QWidget):
         
         if ccfg.estimate_background:
             column_2.addLayout(bg_layout)
-        #column_2.addLayout(poke_layout)
+        column_2.addLayout(poke_layout)
         #column_2.addLayout(modal_layout)
         if ccfg.use_dark_subtraction:
             column_2.addLayout(dark_layout)
-            
-        column_2.addWidget(self.cb_draw_boxes)
-        column_2.addWidget(self.cb_draw_lines)
-        column_2.addWidget(self.pb_poke)
-        column_2.addWidget(self.pb_quit)
+
+
+        annotations_layout = QHBoxLayout()
+        annotations_layout.addWidget(self.cb_draw_boxes)
+        annotations_layout.addWidget(self.cb_draw_lines)
+        column_2.addLayout(annotations_layout)
+
+        other_layout = QHBoxLayout()
+        
+        other_layout.addWidget(self.pb_poke)
+        other_layout.addWidget(self.pb_pseudocalibrate)
+        other_layout.addWidget(self.pb_quit)
+
+        column_2.addLayout(other_layout)
+
         
         column_2.addWidget(self.stripchart_error)
         #column_2.addWidget(self.stripchart_defocus)
@@ -861,7 +874,6 @@ class UI(QWidget):
         
         
         
-        #column_2.addWidget(self.pb_record_reference)
         #column_2.addWidget(self.pb_reload_reference)
         
         column_2.addWidget(self.cb_logging)

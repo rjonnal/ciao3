@@ -476,3 +476,69 @@ class Sensor:
         
         self.unpause()
         time.sleep(1)
+
+
+    def pseudocalibrate(self):
+        print('Pseudocalibrating...')
+        self.pause()
+
+
+        mask = self.sensor_mask
+        mask_sy,mask_sx = mask.shape
+
+
+        dy_px = np.mean(self.search_boxes.y)
+        dx_px = np.mean(self.search_boxes.x)
+        new_x = []
+        new_y = []
+        for y in range(mask_sy):
+            for x in range(mask_sx):
+                if mask[y,x]:
+                    y_m = (y-mask_sy/2)*self.lenslet_pitch_m
+                    y_px = y_m/self.pixel_size_m+dy_px
+                    x_m = (x-mask_sx/2)*self.lenslet_pitch_m
+                    x_px = x_m/self.pixel_size_m+dx_px
+                    new_x.append(x_px)
+                    new_y.append(y_px)
+
+        print(list(zip(new_x,self.search_boxes.x)))
+        print(list(zip(new_y,self.search_boxes.y)))
+        sys.exit()
+        dx_vec = []
+        dy_vec = []
+        for k in range(ccfg.reference_n_measurements):
+            print('measurement %d of %d'%(k+1,ccfg.reference_n_measurements), end=' ')
+            self.sense()
+            print('...done')
+            dx = self.x_centroids-self.search_boxes.x
+            dy = self.y_centroids-self.search_boxes.y
+            dx_vec.append(dx)
+            dy_vec.append(dy)
+
+
+        
+            
+        dx_mean = np.mean(dx_vec)
+        dy_mean = np.mean(dy_vec)
+
+        print(dx_mean,dy_mean)
+        sys.exit()
+        
+        x_ref = self.search_boxes.x+dx_mean
+        y_ref = self.search_boxes.y+dy_mean
+        
+        self.search_boxes = SearchBoxes(x_ref,y_ref,self.search_boxes.half_width)
+        refxy = np.array((x_ref,y_ref)).T
+
+        # Record the new reference set to two locations, the
+        # filename specified by reference_coordinates_filename
+        # in ciao config, and also an archival filename to keep
+        # track of the history.
+        archive_fn = os.path.join(ccfg.reference_directory,prepend('reference.txt',now_string()))
+        
+        np.savetxt(archive_fn,refxy,fmt='%0.3f')
+        np.savetxt(ccfg.reference_coordinates_filename,refxy,fmt='%0.3f')
+        
+        self.unpause()
+        time.sleep(1)
+        
