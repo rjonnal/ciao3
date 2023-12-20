@@ -41,7 +41,7 @@ class BlockTimer:
             self.tick_dict[label] = [time.time()]
 
     def tock(self):
-        print(self.timer_label)
+        #print(self.timer_label)
         ragged_arr = []
         for label in self.labels:
             ragged_arr.append(self.tick_dict[label])

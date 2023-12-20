@@ -11,7 +11,7 @@ sample_rate = 8000.0
 
 def make_sinewave(
         freq=440.0, 
-        duration_seconds=.25, 
+        duration_seconds=.1, 
         volume=1.0):
     
     out = []
