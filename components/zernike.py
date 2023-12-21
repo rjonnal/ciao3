@@ -356,13 +356,31 @@ class Reconstructor:
         dxmat = []
         dymat = []
         hmat = []
+
         
+        nmax,mmax = Z.j2nm(self.N-1)
+
+        height = 1.0/(nmax+1)
+        width = 1.0/(2*mmax)
+        fig = plt.figure(figsize=(8,8))
+        bottom = 1.0-height
         for j in range(self.N):
             n,m = Z.j2nm(j)
             h = Z.get_surface(n,m,refx,refy,kind='h')
             dx = Z.get_surface(n,m,refx,refy,kind='dx')
             dy = Z.get_surface(n,m,refx,refy,kind='dy')
             hmat.append(h)
+            temp = np.zeros(mask.shape)
+            temp[np.where(mask)] = h
+
+            left = (m+mmax)/(2*mmax+1)
+            bottom = 1.0-(n+1)*height
+            ax = fig.add_axes([left,bottom,width,height])
+            ax.imshow(temp)
+            ax.set_title('z[%d], $Z_{%d}^{%d}$'%(j,n,m))
+            ax.set_xticks([])
+            ax.set_yticks([])
+            
             dxmat.append(dx)
             dymat.append(dy)
             
@@ -379,7 +397,9 @@ class Reconstructor:
                 self.astig1_dx = dx
                 self.astig1_dy = dy
         
-    
+        plt.savefig(os.path.join(ccfg.reference_directory,'zernike_polynomials.pdf'))
+        plt.pause(0.0001)
+        
         dxmat = np.array(dxmat)
         dymat = np.array(dymat)
         hmat = np.array(hmat)
