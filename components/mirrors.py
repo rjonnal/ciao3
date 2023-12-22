@@ -188,8 +188,9 @@ class Mirror:
         
     def log(self):
         now = now_string()
+        d = {}
         d['command'] = [float(a) for a in self.controller.command]
-        with open(os.path.join(ccfg.logging_directory,'mirror_%s.json'%now)):
+        with open(os.path.join(ccfg.logging_directory,'mirror_%s.json'%now),'w') as fid:
             outstr = json.dumps(d)
             fid.write(outstr)
         

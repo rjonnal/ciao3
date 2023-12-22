@@ -114,7 +114,7 @@ poke_invert_on_demand = False
 
 ctrl_dictionary_max_size = 10
 
-loop_n_control_modes = 94 # 94 is default !!! I can change EP
+loop_n_control_modes = 82 # 94 is default !!! I can change EP
 loop_gain = 0.9
 loop_loss = 0.01
 loop_update_rate = 500.0

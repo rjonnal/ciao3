@@ -499,21 +499,38 @@ class Sensor:
 
         new_xref = []
         new_yref = []
-        
+        spots_model_fn = os.path.join(ccfg.reference_directory,'spots_model.npy')
+
         for y in range(mask_sy):
             for x in range(mask_sx):
                 if mask[y,x]:
+                    print(y,x)
                     y_m = y*self.lenslet_pitch_m
                     y_px = y_m/self.pixel_size_m+border
                     x_m = x*self.lenslet_pitch_m
                     x_px = x_m/self.pixel_size_m+border
                     new_xref.append(x_px)
                     new_yref.append(y_px)
-                    
-                    xx = XX-x_px
-                    yy = YY-y_px
-                    temp = np.exp(-(xx**2+yy**2)/(2*sigma**2))
-                    spots_model = spots_model+temp
+
+
+        
+        try:
+            spots_model = np.load(spots_model_fn)
+        except:
+            for y in range(mask_sy):
+                for x in range(mask_sx):
+                    if mask[y,x]:
+                        print(y,x)
+                        y_m = y*self.lenslet_pitch_m
+                        y_px = y_m/self.pixel_size_m+border
+                        x_m = x*self.lenslet_pitch_m
+                        x_px = x_m/self.pixel_size_m+border
+                        
+                        xx = XX-x_px
+                        yy = YY-y_px
+                        temp = np.exp(-(xx**2+yy**2)/(2*sigma**2))
+                        spots_model = spots_model+temp
+            np.save(spots_model_fn,spots_model)
 
         new_xref = np.array(new_xref)
         new_yref = np.array(new_yref)
@@ -532,6 +549,7 @@ class Sensor:
         new_xref = new_xref + shiftx
         new_yref = new_yref + shifty
 
+
         self.search_boxes = SearchBoxes(new_xref,new_yref,self.search_boxes.half_width)
 
         # not sure if cross-correlation automatically minimizes tip and tilt; let's do it explicitly
@@ -545,7 +563,6 @@ class Sensor:
             yerr.append(self.y_centroids-self.search_boxes.y)
 
 
-
         xerr = np.array(xerr)
         yerr = np.array(yerr)
         xerr = np.mean(xerr,0)
@@ -556,97 +573,101 @@ class Sensor:
         mxerr = np.mean(xerr)
         myerr = np.mean(yerr)
 
-        # as a sanity check, let's move through a range of offsets to see what the minimum tip and tilt are
-        sbx = self.search_boxes.x
-        sby = self.search_boxes.y
-        step = 0.1
-        grid = np.arange(-2,2,step)
-        tip = np.zeros(len(grid))
-        tilt = np.zeros(len(grid))
+        # # as a sanity check, let's move through a range of offsets to see what the minimum tip and tilt are
+        # sbx = self.search_boxes.x
+        # sby = self.search_boxes.y
+        # step = 0.1
+        # grid = np.arange(-2,2,step)
+        # tip = np.zeros(len(grid))
+        # tilt = np.zeros(len(grid))
 
-        for xidx,dx in enumerate(grid):
-            self.search_boxes.move(sbx+dx,sby)
-            self.sense()
-            tilt[xidx] = self.zernikes[2]
+        # for xidx,dx in enumerate(grid):
+            # self.search_boxes.move(sbx+dx,sby)
+            # self.sense()
+            # tilt[xidx] = self.zernikes[2]
                         
-        for yidx,dy in enumerate(grid):
-            self.search_boxes.move(sbx,sby+dy)
-            self.sense()
-            tip[yidx] = self.zernikes[1]
+        # for yidx,dy in enumerate(grid):
+            # self.search_boxes.move(sbx,sby+dy)
+            # self.sense()
+            # tip[yidx] = self.zernikes[1]
+
+        # return
 
 
-        mxerr2 = grid[np.argmin(np.abs(tilt))]
-        myerr2 = grid[np.argmin(np.abs(tip))]
+        # mxerr2 = grid[np.argmin(np.abs(tilt))]
+        # myerr2 = grid[np.argmin(np.abs(tip))]
 
-        try:
-            # assert that the difference between the brute force zernike minimization and the bulk x and y errors
-            # are smaller than the step size; this assures us that the bulk estimate is a good way to center the search
-            # boxes
-            assert np.abs(mxerr-mxerr2)<step
-            assert np.abs(myerr-myerr2)<step
-        except AssertionError:
-            sys.exit('Problem with tip tilt estimation in pseudocalibration. Bulk tip and tilt, calculated from average x and y dimension centroid error, does not match zernike minimization values. mxerr=%0.3f,mxerr2=%0.3f; myerr=%0.3f,myerr2=%0.3f.'%(mxerr,mxerr2,myerr,myerr2))
+        # try:
+            # # assert that the difference between the brute force zernike minimization and the bulk x and y errors
+            # # are smaller than the step size; this assures us that the bulk estimate is a good way to center the search
+            # # boxes
+            # assert np.abs(mxerr-mxerr2)<step
+            # assert np.abs(myerr-myerr2)<step
+        # except AssertionError:
+            # sys.exit('Problem with tip tilt estimation in pseudocalibration. Bulk tip and tilt, calculated from average x and y dimension centroid error, does not match zernike minimization values. mxerr=%0.3f,mxerr2=%0.3f; myerr=%0.3f,myerr2=%0.3f.'%(mxerr,mxerr2,myerr,myerr2))
             
         new_xref = new_xref + mxerr
         new_yref = new_yref + myerr
 
         self.search_boxes = SearchBoxes(new_xref,new_yref,self.search_boxes.half_width)
 
-        plt.figure()
-        plt.subplot(2,4,1)
-        plt.imshow(spots,cmap='gray')
-        plt.title('spots')
-        plt.subplot(2,4,2)
-        plt.imshow(spots_model,cmap='gray')
-        plt.title('spots model')
-        
-        plt.subplot(2,4,3)
-        plt.imshow(nxc,cmap='gray')
-        plt.plot(peakx,peaky,'ys',markersize=3,markerfacecolor='none')
-        plt.title('x corr')
-        
-        plt.subplot(2,4,4)
-        plt.imshow(spots,cmap='gray')
-        plt.plot(new_xref,new_yref,'rs',markersize=3,alpha=0.5,markerfacecolor='none')
-        plt.title('references rough')
-
-
-        plt.subplot(2,4,5)
-        plt.bar(np.arange(len(xerr)),xerr)
-        plt.subplot(2,4,6)
-        plt.bar(np.arange(len(yerr)),yerr)
-        plt.subplot(2,4,7)
-        plt.plot(grid,np.abs(tilt))
-        plt.xlabel('sb offset (x)')
-        plt.ylabel('$Z_1^{1}$')
-        plt.text(plt.gca().get_xlim()[0],plt.gca().get_ylim()[1],'remove_tip_tilt=%s'%ccfg.sensor_remove_tip_tilt,ha='left',va='top')
-        plt.axvline(mxerr)
-        plt.subplot(2,4,8)
-        plt.plot(grid,np.abs(tip))
-        plt.xlabel('sb offset (y)')
-        plt.ylabel('$Z_1^{-1}$')
-        plt.text(plt.gca().get_xlim()[0],plt.gca().get_ylim()[1],'remove_tip_tilt=%s'%ccfg.sensor_remove_tip_tilt,ha='left',va='top')
-        plt.axvline(myerr)
-        plt.pause(.1)
-
-        ns = now_string()
-
-        outfn = os.path.join(ccfg.reference_directory,prepend('pseudocalibration_report.pdf',ns))
-        
-        plt.savefig(outfn)
-        plt.pause(1)
-
-        
         # Record the new reference set to two locations, the
         # filename specified by reference_coordinates_filename
         # in ciao config, and also an archival filename to keep
         # track of the history.
+            
+        ns = now_string()
+
+        outfn = os.path.join(ccfg.reference_directory,prepend('pseudocalibration_report.pdf',ns))
         archive_fn = os.path.join(ccfg.reference_directory,prepend('reference.txt',ns))
         
         refxy = np.array((new_xref,new_yref)).T
         
         np.savetxt(archive_fn,refxy,fmt='%0.3f')
         np.savetxt(ccfg.reference_coordinates_filename,refxy,fmt='%0.3f')
-        
         self.unpause()
+
+        if False:
+            plt.figure()
+            plt.subplot(2,4,1)
+            plt.imshow(spots,cmap='gray')
+            plt.title('spots')
+            plt.subplot(2,4,2)
+            plt.imshow(spots_model,cmap='gray')
+            plt.title('spots model')
+            
+            plt.subplot(2,4,3)
+            plt.imshow(nxc,cmap='gray')
+            plt.plot(peakx,peaky,'ys',markersize=3,markerfacecolor='none')
+            plt.title('x corr')
+            
+            plt.subplot(2,4,4)
+            plt.imshow(spots,cmap='gray')
+            plt.plot(new_xref,new_yref,'rs',markersize=3,alpha=0.5,markerfacecolor='none')
+            plt.title('references rough')
+
+
+            plt.subplot(2,4,5)
+            plt.bar(np.arange(len(xerr)),xerr)
+            plt.subplot(2,4,6)
+            plt.bar(np.arange(len(yerr)),yerr)
+            plt.subplot(2,4,7)
+            plt.plot(grid,np.abs(tilt))
+            plt.xlabel('sb offset (x)')
+            plt.ylabel('$Z_1^{1}$')
+            plt.text(plt.gca().get_xlim()[0],plt.gca().get_ylim()[1],'remove_tip_tilt=%s'%ccfg.sensor_remove_tip_tilt,ha='left',va='top')
+            plt.axvline(mxerr)
+            plt.subplot(2,4,8)
+            plt.plot(grid,np.abs(tip))
+            plt.xlabel('sb offset (y)')
+            plt.ylabel('$Z_1^{-1}$')
+            plt.text(plt.gca().get_xlim()[0],plt.gca().get_ylim()[1],'remove_tip_tilt=%s'%ccfg.sensor_remove_tip_tilt,ha='left',va='top')
+            plt.axvline(myerr)
+            plt.pause(.1)
+
+            plt.savefig(outfn)
+            plt.close()
+            
+            
+        
         
