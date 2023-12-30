@@ -688,6 +688,7 @@ class UI(QWidget):
         self.centroiding_width_spinbox.setMinimum(0)
         self.centroiding_width_spinbox.valueChanged.connect(self.loop.sensor.set_centroiding_half_width)
         self.centroiding_width_spinbox.setValue(self.loop.sensor.centroiding_half_width)
+        centroiding_layout.addWidget(QLabel('Fast centroiding half width'))
         centroiding_layout.addWidget(self.centroiding_width_spinbox)
         
         
@@ -776,10 +777,11 @@ class UI(QWidget):
         exp_layout = QHBoxLayout()
         exp_layout.addWidget(QLabel('Exposure (us):'))
         self.exp_spinbox = QSpinBox()
-        self.exp_spinbox.setValue(self.loop.sensor.cam.get_exposure())
+        exp = self.loop.sensor.cam.get_exposure()
         self.exp_spinbox.setSingleStep(100)
         self.exp_spinbox.setMaximum(1000000)
         self.exp_spinbox.setMinimum(100)
+        self.exp_spinbox.setValue(exp)
         self.exp_spinbox.valueChanged.connect(self.loop.sensor.cam.set_exposure)
         exp_layout.addWidget(self.exp_spinbox)
         
@@ -831,8 +833,8 @@ class UI(QWidget):
         column_2.addLayout(loop_control_layout)
         #column_2.addWidget(self.cb_fast_centroiding)
         column_2.addLayout(aberration_layout)
-        #column_2.addLayout(exp_layout)
-        #column_2.addLayout(centroiding_layout)
+        column_2.addLayout(exp_layout)
+        column_2.addLayout(centroiding_layout)
         
         if ccfg.estimate_background:
             column_2.addLayout(bg_layout)

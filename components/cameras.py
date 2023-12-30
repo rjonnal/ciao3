@@ -34,7 +34,7 @@ class PylonCamera:
             pylon.TlFactory.GetInstance().CreateFirstDevice())
 
         self.camera.Open()
-
+        self.camera.PixelFormat.Value = 'Mono12'
         # enable all chunks
         self.camera.ChunkModeActive = True
         #self.camera.PixelFormat = "Mono12"
@@ -54,10 +54,11 @@ class PylonCamera:
         return
 
     def set_exposure(self,exposure_us):
+        self.camera.ExposureTime.Value = float(exposure_us)
         return
         
     def get_exposure(self):
-        return 10000
+        return int(self.camera.ExposureTime.Value)
     
 
 class XimeaCamera:

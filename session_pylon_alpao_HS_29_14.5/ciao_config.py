@@ -90,7 +90,7 @@ spots_threshold = 100.0
 sensor_update_rate = 1.0 # deprecated in current version
 sensor_filter_lenslets = False
 sensor_reconstruct_wavefront = True
-sensor_remove_tip_tilt = True
+sensor_remove_tip_tilt = False
 centroiding_num_threads = 1
 
 camera_exposure_us = 10000
