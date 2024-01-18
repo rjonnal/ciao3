@@ -69,8 +69,8 @@ mirror_command_min = -1.0
 mirror_settling_time_s = 0.001
 mirror_n_actuators = 97
 
-poke_command_max = 0.3
-poke_command_min = -0.3
+poke_command_max = 0.1
+poke_command_min = -0.1
 poke_n_command_steps = 5
 poke_invert_on_demand = False
 
