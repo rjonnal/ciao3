@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import time
 from . import centroid
 import sys
@@ -27,6 +28,41 @@ import ciao_config as ccfg
 from .frame_timer import FrameTimer,BlockTimer
 from .poke import Poke
 
+class DataBuffer:
+
+    def __init__(self,size_limit=1000,columns=None,tag='buffer'):
+        self.buf = []
+        self.size_limit = size_limit
+        self.size = 0
+        self.t0 = time.time()
+        self.cols = columns
+        self.tag = tag
+        
+    def add(self,new_list):
+        assert type(new_list)==list
+        t = time.time()-self.t0
+        new_list = [t]+new_list
+        self.buf.append(new_list)
+        self.size+=1
+        while len(self.buf)>self.size_limit:
+            self.buf = self.buf[1:]
+            self.size-=1
+
+    def save(self):
+        folder = self.tag
+        os.makedirs(folder,exist_ok=True)
+        ns = now_string()
+        if self.cols is None:
+            cols = ['time (s)']+['col %05d'%k for k in range(len(self.buf[-1])-1)]
+        else:
+            cols = ['time (s)']+self.cols
+            
+        df = pd.DataFrame(self.buf,columns=cols)
+        df.to_csv(os.path.join(folder,'%s_%s.csv'%(self.tag,ns)))
+
+    def full(self):
+        return self.size==self.size_limit
+    
 class Loop(QObject):
 
     finished = pyqtSignal()
@@ -49,6 +85,9 @@ class Loop(QObject):
         self.poke = None
         self.closed = False
         self.safe = True
+
+        cols = ['x slope %03d'%k for k in range(n_lenslets)]+['y  slope %03d'%k for k in range(n_lenslets)]
+        self.buf = DataBuffer(columns=cols,tag='slopes_buffer')
 
         # try to load the poke file specified in
         # ciao_config.py; if it doesn't exist, create
@@ -74,6 +113,9 @@ class Loop(QObject):
         except:
             self.profile_update_method = False
 
+
+    def __del__(self):
+        self.buf.save()
         
     def start(self):
         self.timer = QTimer()
@@ -195,6 +237,12 @@ class Loop(QObject):
             self.update_timer.tock()
             
         self.finished.emit()
+        self.buf.add(list(np.hstack((self.sensor.x_slopes,self.sensor.y_slopes))))
+        
+        #if self.buf.full():
+        #    #print(self.buf.buf)
+        #    self.buf.save()
+        #    sys.exit()
         
         
     def load_poke(self,poke_filename=None):

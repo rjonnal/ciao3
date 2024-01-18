@@ -600,6 +600,9 @@ class UI(QWidget):
         self.cb_logging.setChecked(False)
         self.cb_logging.stateChanged.connect(self.loop.sensor.set_logging)
         self.cb_logging.stateChanged.connect(self.loop.mirror.set_logging)
+
+        self.pb_save_buffer = QPushButton('Save slopes')
+        self.pb_save_buffer.clicked.connect(self.loop.buf.save)
         
         self.pb_poke = QPushButton('Measure poke matrix')
         self.pb_poke.clicked.connect(self.loop.run_poke)
@@ -810,12 +813,14 @@ class UI(QWidget):
         self.ind_image_mean = Indicator(buffer_length=10,print_function=lambda x: '%d ADU (mean)'%x)
         self.ind_image_min = Indicator(buffer_length=10,print_function=lambda x: '%d ADU (min)'%x)
         self.ind_mean_box_background = Indicator(buffer_length=10,print_function=lambda x: '%d ADU (background)'%x)
+        self.ind_buffer_size = Indicator(buffer_length=10,print_function=lambda x: '%d (buf length)'%x)
+        
         
         self.ind_image_max.setAlignment(Qt.AlignRight)
         self.ind_image_mean.setAlignment(Qt.AlignRight)
         self.ind_image_min.setAlignment(Qt.AlignRight)
         self.ind_mean_box_background.setAlignment(Qt.AlignRight)
-        
+        self.ind_buffer_size.setAlignment(Qt.AlignRight)
 
         self.lbl_mirror_fps = QLabel()
         self.lbl_mirror_fps.setAlignment(Qt.AlignRight)
@@ -869,6 +874,7 @@ class UI(QWidget):
         column_2.addWidget(self.ind_mean_box_background)
         
         column_2.addWidget(self.ind_centroiding_time)
+        column_2.addWidget(self.ind_buffer_size)
         
         column_2.addWidget(self.lbl_sensor_fps)
         column_2.addWidget(self.lbl_mirror_fps)
@@ -879,6 +885,7 @@ class UI(QWidget):
         #column_2.addWidget(self.pb_reload_reference)
         
         column_2.addWidget(self.cb_logging)
+        column_2.addWidget(self.pb_save_buffer)
         
         layout.addLayout(column_2,0,6,3,1)
         
@@ -969,7 +976,7 @@ class UI(QWidget):
         self.ind_image_mean.setValue(sensor.image_mean)
         self.ind_image_min.setValue(sensor.image_min)
         self.ind_mean_box_background.setValue(sensor.get_average_background())
-        
+        self.ind_buffer_size.setValue(self.loop.buf.size)
         self.ind_centroiding_time.setValue(sensor.centroiding_time)
         
         self.lbl_sensor_fps.setText(ccfg.sensor_fps_fmt%sensor.frame_timer.fps)
