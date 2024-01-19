@@ -59,7 +59,9 @@ class DataBuffer:
             
         df = pd.DataFrame(self.buf,columns=cols)
         df.to_csv(os.path.join(folder,'%s_%s.csv'%(self.tag,ns)))
-
+        self.buf = []
+        self.size = 0
+        
     def full(self):
         return self.size==self.size_limit
     
