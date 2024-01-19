@@ -604,6 +604,9 @@ class UI(QWidget):
         self.pb_save_buffer = QPushButton('Save slopes')
         self.pb_save_buffer.clicked.connect(self.loop.buf.save)
         
+        self.pb_clear_buffer = QPushButton('Clear slopes')
+        self.pb_clear_buffer.clicked.connect(self.loop.buf.clear)
+        
         self.pb_poke = QPushButton('Measure poke matrix')
         self.pb_poke.clicked.connect(self.loop.run_poke)
 
@@ -813,7 +816,7 @@ class UI(QWidget):
         self.ind_image_mean = Indicator(buffer_length=10,print_function=lambda x: '%d ADU (mean)'%x)
         self.ind_image_min = Indicator(buffer_length=10,print_function=lambda x: '%d ADU (min)'%x)
         self.ind_mean_box_background = Indicator(buffer_length=10,print_function=lambda x: '%d ADU (background)'%x)
-        self.ind_buffer_size = Indicator(buffer_length=10,print_function=lambda x: '%d (buf length)'%x)
+        self.ind_buffer_size = Indicator(buffer_length=1,print_function=lambda x: '%d (buf length)'%x)
         
         
         self.ind_image_max.setAlignment(Qt.AlignRight)
@@ -880,13 +883,14 @@ class UI(QWidget):
         column_2.addWidget(self.lbl_mirror_fps)
         column_2.addWidget(self.lbl_ui_fps)
         
-        
-        
         #column_2.addWidget(self.pb_reload_reference)
-        
-        column_2.addWidget(self.cb_logging)
-        column_2.addWidget(self.pb_save_buffer)
-        
+        logging_layout = QHBoxLayout()
+
+        logging_layout.addWidget(self.cb_logging)
+        logging_layout.addWidget(self.pb_clear_buffer)
+        logging_layout.addWidget(self.pb_save_buffer)
+
+        column_2.addLayout(logging_layout)
         layout.addLayout(column_2,0,6,3,1)
         
         self.setLayout(layout)

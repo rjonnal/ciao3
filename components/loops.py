@@ -64,6 +64,10 @@ class DataBuffer:
         
     def full(self):
         return self.size==self.size_limit
+
+    def clear(self):
+        self.buf = []
+        self.size = 0
     
 class Loop(QObject):
 
