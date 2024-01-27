@@ -8,10 +8,10 @@ Python tools for controlling, simulating, and characterizing adaptive optics (AO
 These are the prerequisites for installing a version of the software which allows it to be run in simulation mode.
 
 1. Install [emacs](https://www.gnu.org/software/emacs/), [Notepad++](https://notepad-plus-plus.org/download), or another editor.
-2. Install [Git](https://git-scm.com/download/win)
-3. Install [Anaconda for Python 2.7](https://www.anaconda.com/distribution/#download-section)
-4. If you're using Windows, install the [Visual C++ compiler for Python 2.7](https://www.microsoft.com/en-us/download/details.aspx?id=44266). In Linux, gcc will be invoked instead; it's probably already installed on your system, but you can verify that it is with ```gcc --version```.
-5. Clone this repository.
+2. Install [Git](https://git-scm.com/download/)
+3. Install [Anaconda for Python 3.8+](https://www.anaconda.com/download#downloads)
+4. If you're using Windows, install the [Visual C++ compiler for Python](https://wiki.python.org/moin/WindowsCompilers). Make sure you get the right version for your Anaconda Python install. In Linux, gcc will be invoked instead; it's probably already installed on your system, but you can verify that it is with ```gcc --version```.
+5. If necessary, create a directory where your Python libraries will reside, and add that directory to the environment variable `PYTHONPATH`. Clone this repository into that directory: `git clone https://github.com/rjonnal/ciao3`.
 
 These prerequisites assume you are using the default hardware (Alpao mirror and a SHWS based on a Basler Ace USB3 camera).
 
@@ -29,7 +29,7 @@ Almost everything in CIAO could be written in Python using the Numpy library, wi
 
     python setup.py build_ext --inplace
     
-You may see some warnings (e.g. about deprecation of Numpy features), but shouldn't see any errors.
+You may see some warnings (e.g. about deprecation of Numpy features), but shouldn't see any errors. After that, copy the new `.so` or `.pyd` file into the `ciao/components/` folder and rename it `centroid.so` or `centroid.pyd`.
 
 # Quick start
 
@@ -60,7 +60,7 @@ If you have succesfully completed the "Setup and installation" steps above, foll
 
 8. Issue ```python script_record_initial_reference_coordinates.py etc/ref/reference_initial.txt``` to create bootstrapping reference coordinates. Follow the instructions in the terminal and use the resulting plots to refine these coordinates.
 9. Issue ```python ui_ciao.py```. The UI should appear.
-10. Click **Record reference** a few times.
+10. Click **Pseudocalibrate** a few times.
 11. Click **Measure poke matrix** and wait for the poke matrix to be measured.
 12. Click **Loop closed**.
 
