@@ -8,10 +8,10 @@ Python tools for controlling, simulating, and characterizing adaptive optics (AO
 These are the prerequisites for installing a version of the software which allows it to be run in simulation mode.
 
 1. Install [emacs](https://www.gnu.org/software/emacs/), [Notepad++](https://notepad-plus-plus.org/download), or another editor.
-2. Install [Git](https://git-scm.com/download/win)
-3. Install [Anaconda for Python 2.7](https://www.anaconda.com/distribution/#download-section)
-4. If you're using Windows, install the [Visual C++ compiler for Python 2.7](https://www.microsoft.com/en-us/download/details.aspx?id=44266). In Linux, gcc will be invoked instead; it's probably already installed on your system, but you can verify that it is with ```gcc --version```.
-5. Clone this repository.
+2. Install [Git](https://git-scm.com/download/)
+3. Install [Anaconda for Python 3.8+](https://www.anaconda.com/download#downloads)
+4. If you're using Windows, install the [Visual C++ compiler for Python](https://wiki.python.org/moin/WindowsCompilers). Make sure you get the right version for your Anaconda Python install. In Linux, gcc will be invoked instead; it's probably already installed on your system, but you can verify that it is with ```gcc --version```.
+5. If necessary, create a directory where your Python libraries will reside, and add that directory to the environment variable `PYTHONPATH`. Clone this repository into that directory: `git clone https://github.com/rjonnal/ciao3`.
 
 These prerequisites assume you are using the default hardware (Alpao mirror and a SHWS based on a Basler Ace USB3 camera).
 
@@ -29,7 +29,7 @@ Almost everything in CIAO could be written in Python using the Numpy library, wi
 
     python setup.py build_ext --inplace
     
-You may see some warnings (e.g. about deprecation of Numpy features), but shouldn't see any errors.
+You may see some warnings (e.g. about deprecation of Numpy features), but shouldn't see any errors. After that, copy the new `.so` or `.pyd` file into the `ciao/components/` folder and rename it `centroid.so` or `centroid.pyd`.
 
 # Quick start
 
@@ -60,7 +60,7 @@ If you have succesfully completed the "Setup and installation" steps above, foll
 
 8. Issue ```python script_record_initial_reference_coordinates.py etc/ref/reference_initial.txt``` to create bootstrapping reference coordinates. Follow the instructions in the terminal and use the resulting plots to refine these coordinates.
 9. Issue ```python ui_ciao.py```. The UI should appear.
-10. Click **Record reference** a few times.
+10. Click **Pseudocalibrate** a few times.
 11. Click **Measure poke matrix** and wait for the poke matrix to be measured.
 12. Click **Loop closed**.
 
@@ -68,7 +68,7 @@ If you have succesfully completed the "Setup and installation" steps above, foll
 
 ## CIAO sessions and ```ciao_config.py```
 
-CIAO depends on a notion of a *session*, which allows multiple configurations to be installed on the same computer. For instance, it may be useful to have a closed-loop session, a wavefront sensing session (e.g., for system alignment with a separate, calibrated sensor), and a simulation session, all on one computer. Each session requires a dedicated folder/directory, and a dedicated ```ciao_config.py``` file which specifies all of the relevant parameters of the session. CIAO has many tools, and there is a broad variety of use cases, some covered below; however, the two main ways to use CIAO are 1) as part of a GUI-based program for wavefront sensing or correction, where real-time feedback is critical; and 2) as part of a script to calibrate the system or make measurements. By convention, these programs are prefaced with ```ui_``` and ```script_```, respectively. These scripts must all be located in the session folder, alongside ```ciao_config.py```.
+CIAO depends on a notion of a *session*, which allows multiple configurations to be installed on the same computer. For instance, it may be useful to have a closed-loop session, a wavefront sensing session (e.g., for system alignment with a separate, calibrated sensor), and a simulation session, all on one computer. Each session requires a dedicated folder/directory, and a dedicated ```ciao_config.py``` file which specifies all of the relevant parameters of the session. CIAO has many tools, and there is a broad variety of use cases, some covered below; however, the three main ways to use CIAO are 1) as part of a GUI-based program for wavefront sensing or correction, where real-time feedback is critical; 2) as part of a script to calibrate the system or make measurements; 3) in a [Jupyter](https://jupyter.org/) notebook designed for instruction or documentation. By convention, these programs are prefaced with ```ui_```, ```script_```, and ```nb_``` respectively. These scripts must all be located in the session folder, alongside ```ciao_config.py```.
 
 The advantage of this approach is that once things are configured correctly, the sessions can be run without modifications, even simultaneously (notwithstanding device driver conflicts). A disadvantage of this approach is that the top level programs scripts must add their filesystem locations to the Python path at runtime, because the rest of CIAO will all need access to the same ```ciao_config.py``` file, and attempt to import it. A related disadvantage is that users should be careful to avoid putting copies of ```ciao_config.py``` elsewhere, e.g. in the ```components``` directory or in any folder in the Python path, where it could in principle be loaded instead of the correct file for the session. Session directories should also never be added to the Python path, as this could result in the loading of incorrect versions of ```ciao_config.py```. (See **Design considerations** below for alternative approaches which were not pursued but may be preferable).
 

@@ -118,6 +118,16 @@ class Sensor:
         self.reconstructor = Reconstructor(self.search_boxes.x,
                                            self.search_boxes.y,self.sensor_mask)
 
+        try:
+            wavefront_folder = ccfg.wavefront_folder
+        except:
+            wavefront_folder = './etc/wf'
+        
+        os.makedirs(wavefront_folder,exist_ok=True)
+        np.savetxt(os.path.join(wavefront_folder,'zernike_matrix.txt'),self.reconstructor.zernike_matrix)
+        np.savetxt(os.path.join(wavefront_folder,'slope_matrix.txt'),self.reconstructor.slope_matrix)
+        np.savetxt(os.path.join(wavefront_folder,'wavefront_matrix.txt'),self.reconstructor.wavefront_matrix)
+        
         self.n_zernike_orders_corrected=self.reconstructor.N_orders
         self.centroiding_time = -1.0
 

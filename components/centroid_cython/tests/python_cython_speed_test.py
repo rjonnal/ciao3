@@ -1,9 +1,8 @@
-import centroid
 from matplotlib import pyplot as plt
 import glob,sys,os
 import numpy as np
 from time import time
-import centroid
+from ciao3.components import centroid
 
 image_width = 2048
 fractional_spot_positions = np.arange(0.1,0.9,0.03)
@@ -66,7 +65,7 @@ def fast_centroids(spots_image,sb_x_vec,sb_y_vec,sb_half_width,centroiding_half_
         y2 = int(round(sb_y_vec[spot_index]+sb_half_width))
 
         if verbose:
-            print 'python A',spot_index,x1,x2,y1,y2
+            print(('python A',spot_index,x1,x2,y1,y2))
         
         for y in range(y1,y2+1):
             for x in range(x1,x2+1):
@@ -82,7 +81,7 @@ def fast_centroids(spots_image,sb_x_vec,sb_y_vec,sb_half_width,centroiding_half_
         y2 = int(round(max_y+centroiding_half_width))
 
         if verbose:
-            print 'python B',spot_index,x1,x2,y1,y2
+            print(('python B',spot_index,x1,x2,y1,y2))
         
         xnum = 0.0
         ynum = 0.0
@@ -107,13 +106,13 @@ python_cython_err = (xout-pxout).tolist()+(yout-pyout).tolist()
 if any(python_cython_err):
     sys.exit('Error between Cython centroiding and Python centroiding. Please fix.')
 else:
-    print 'Cython centroid centers of mass match pure Python calculations.'
+    print('Cython centroid centers of mass match pure Python calculations.')
     
 cython_ground_truth_err = (xout-x_spot_location).tolist()+(yout-y_spot_location).tolist()
 if any(cython_ground_truth_err):
     sys.exit('Error between Cython centroiding and ground truth. Please fix.')
 else:
-    print 'Cython centroid centers of mass match ground truth.'
+    print('Cython centroid centers of mass match ground truth.')
 
 N = 1000
 t0 = time()
@@ -124,4 +123,15 @@ t_total = time()-t0
 t_iteration = t_total/float(N)
 fps = 1.0/t_iteration
 
-print '%d spots, %d iterations, total time %0.1f, iteration time %0.1e, fps %0.1f'%(n_spots,N,t_total,t_iteration,fps)
+print(('Compiled centroiding: %d spots, %d iterations, total time %0.1f, iteration time %0.1e, fps %0.1f'%(n_spots,N,t_total,t_iteration,fps)))
+
+N = 10
+t0 = time()
+for k in range(N):
+    fast_centroids(spots_image,sb_x_vec,sb_y_vec,sb_half_width,centroiding_half_width)
+
+t_total = time()-t0
+t_iteration = t_total/float(N)
+fps = 1.0/t_iteration
+
+print(('Interpreted centroiding: %d spots, %d iterations, total time %0.1f, iteration time %0.1e, fps %0.1f'%(n_spots,N,t_total,t_iteration,fps)))
