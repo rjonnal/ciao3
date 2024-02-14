@@ -287,6 +287,14 @@ class Loop(QObject):
             time.sleep(.001)
             self.close_ok = ccfg.loop_condition_llim<self.get_condition_number()<ccfg.loop_condition_ulim
 
+
+    def set_gain(self,g):
+        try:
+            self.gain = g
+        except Exception as e:
+            print(e)
+            
+            
     def set_n_modes(self,n):
         try:
             self.poke.n_modes = n

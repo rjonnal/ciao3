@@ -58,7 +58,7 @@ sensor_reconstruct_wavefront = True
 sensor_remove_tip_tilt = False
 centroiding_num_threads = 1
 iterative_centroiding_step = 2
-centroiding_iterations = 2
+centroiding_iterations = 5
 use_dark_subtraction = False
 
 mirror_update_rate = 1.0 # deprecated in current version
