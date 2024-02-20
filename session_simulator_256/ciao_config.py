@@ -58,7 +58,7 @@ sensor_reconstruct_wavefront = True
 sensor_remove_tip_tilt = False
 centroiding_num_threads = 1
 iterative_centroiding_step = 2
-centroiding_iterations = 5
+centroiding_iterations = 2
 use_dark_subtraction = False
 
 mirror_update_rate = 1.0 # deprecated in current version
@@ -68,6 +68,7 @@ mirror_command_max = 1.0
 mirror_command_min = -1.0
 mirror_settling_time_s = 0.001
 mirror_n_actuators = 97
+mirror_warmup_actuators = [80,81,82]
 
 poke_command_max = 0.1
 poke_command_min = -0.1
