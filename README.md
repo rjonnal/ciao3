@@ -60,9 +60,23 @@ If you have succesfully completed the "Setup and installation" steps above, foll
 
 8. Issue ```python script_record_initial_reference_coordinates.py etc/ref/reference_initial.txt``` to create bootstrapping reference coordinates. Follow the instructions in the terminal and use the resulting plots to refine these coordinates.
 9. Issue ```python ui_ciao.py```. The UI should appear.
-10. Click **Pseudocalibrate** a few times.
+10. Click **Pseudocalibrate** a few times. The first time you do this it will take a few minutes. The slowest step is generating a simulated/theoretical spots image that is required for determining the ideal location of the reference coordinates.
 11. Click **Measure poke matrix** and wait for the poke matrix to be measured.
 12. Click **Loop closed**.
+
+# Calibration using a planar wavefront
+
+If you have a planar reference wavefront incident on the SHWS and would like to use it to calibrate the reference coordinates, do the following:
+
+1. Edit ```SESSION/ciao_config.py``` and check the value of ```reference_n_measurements```. The default value should be 10, but this may be increased if the SHWS SNR is low. This constant determines the number of spots images that will be centroided. The resulting centers of mass will be averaged together to generate the reference coordinates.
+2. Issue ```python ui_ciao.py```. The UI should appear.
+3. Place a model eye in the system such that the SHWS spots appear where they will when measuring an eye.
+4. Adjust the exposure time in the UI such that at least half of the camera's dynamic range is used (e.g., 2048 for a 12-bit camera).
+5. Click **Pseudocalibrate**. This may take a few minutes. This will generate reference coordinates and search boxes using the lenslet array's geometry, as specified in the session's ```ciao_config.py```. The relative coordinates are determined by the lenslet geometry, while the absolute coordinates are determined by cross-correlation of a simulated spots image with what is currently seen on the camera.
+6. Remove or block the model eye, and direct the planar reference beam to the SHWS.
+7. If necessary, adjust the exposure time again such that such that at least half of the camera's dynamic range is used (e.g., 2048 for a 12-bit camera).
+8. If necessary, adjust tip and tilt of the reference beam to center them in the existing search boxes as well as possible. This is a good thing to do because the reference coordinates are most accurately recorded when the spots are centered, since the impact of background estimation error is minimized. **The planar beam's tip and tilt should not be adjusted using any optical elements shared by the planar reference beam and the model eye beam**, since it's critical at this stage not to affect the model eye (or real eye) spot locations.
+9. Click **Record Reference**. This will alter the real time reference coordinates as well as the ```etc/ref/reference.txt``` file, such that subsequent runs of ```ui_ciao.py``` will use the newly recorded reference.
 
 # Slow start
 
