@@ -873,6 +873,7 @@ class UI(QWidget):
         
         other_layout.addWidget(self.pb_poke)
         other_layout.addWidget(self.pb_pseudocalibrate)
+        other_layout.addWidget(self.pb_record_reference)
         other_layout.addWidget(self.pb_quit)
 
         column_2.addLayout(other_layout)
@@ -958,9 +959,9 @@ class UI(QWidget):
                                self.loop.sensor.search_boxes.y2):
             self.boxes_coords.append((x1,x2,y1,y2))
 
+        newcolor = [np.random.randint(0,255) for k in range(4)]
+        self.overlay_boxes = Overlay(coords=self.boxes_coords,mode='rects',color=newcolor,thickness=ccfg.search_box_thickness)
         #self.overlay_boxes = Overlay(coords=self.boxes_coords,mode='rects',color=ccfg.search_box_color,thickness=ccfg.search_box_thickness)
-
-
 
 
             
