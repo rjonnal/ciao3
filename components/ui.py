@@ -638,6 +638,18 @@ class UI(QWidget):
         self.pb_quit.clicked.connect(self.quit)
 
         poke_layout = QHBoxLayout()
+
+        poke_layout.addWidget(QLabel('Gain:'))
+        self.gain_spinbox = QDoubleSpinBox()
+        self.gain_spinbox.setValue(ccfg.loop_gain)
+        self.gain_spinbox.setSingleStep(0.01)
+        self.gain_spinbox.setMaximum(1.0)
+        self.gain_spinbox.setMinimum(0.0)
+        self.gain_spinbox.valueChanged.connect(self.loop.set_gain)
+        poke_layout.addWidget(self.gain_spinbox)
+
+
+        
         poke_layout.addWidget(QLabel('Modes:'))
         self.modes_spinbox = QSpinBox()
         n_actuators = int(np.sum(self.loop.mirror.mirror_mask))

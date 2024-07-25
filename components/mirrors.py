@@ -145,6 +145,7 @@ class Mirror:
         self.logging = False
         self.paused = False
         os.makedirs(ccfg.logging_directory,exist_ok=True)
+        self.warmup()
         
     def update(self):
         if not self.paused:
@@ -197,3 +198,17 @@ class Mirror:
 
     def set_logging(self,val):
         self.logging = val
+
+
+    def warmup(self,reps=5):
+        try:
+            mirror_warmup_actuators = ccfg.mirror_warmup_actuators
+            currents = np.linspace(ccfg.poke_command_min,ccfg.poke_command_max,ccfg.poke_n_command_steps)
+            for actuator in mirror_warmup_actuators:
+                for rep in range(reps):
+                    for c in currents:
+                        print('Warming up actuator %d, rep %d, current %0.2f.'%(actuator,rep,c))
+                        self.set_actuator(actuator,c)
+            self.flatten()
+        except AttributeError as ae:
+            print('mirror_warmup_actuators not set in ciao_config.py; to run warmup, define this list')

@@ -1,6 +1,6 @@
 import ciao_config as ccfg
 import numpy as np
-import time
+import time,sys
 
 class Poke:
     def __init__(self,poke_matrix):
@@ -102,7 +102,7 @@ class Poke:
         if sanity_check:
             # double check the explicit Moore-Penrose pseudoinverse
             # above with LAPACK implementation (pinv)
-            cutoff_cond = s[n_modes]/s[0]
+            cutoff_cond = s[self.n_modes]/s[0]
             test = np.linalg.pinv(poke,cutoff_cond)
             if np.allclose(test,ctrlmat):
                 print('Pseudoinverse is correct.')

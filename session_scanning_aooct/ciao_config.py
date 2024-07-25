@@ -86,7 +86,6 @@ iterative_centroiding_step = 2
 # to make sure that the spots are bright enough. This threshold determines whether they are valid.
 spots_threshold = 100.0
 
-
 sensor_update_rate = 1.0 # deprecated in current version
 sensor_filter_lenslets = False
 sensor_reconstruct_wavefront = True
@@ -99,6 +98,7 @@ profile_ui_update_method = True
 profile_sensor_update_method = True
 profile_loop_update_method = True
 
+# mirror settings
 mirror_update_rate = 1.0 # deprecated in current version
 mirror_flat_filename = dm_directory + 'flat.txt'
 mirror_mask_filename = dm_directory + 'mirror_mask.txt'
@@ -107,20 +107,22 @@ mirror_command_min = -1.0
 mirror_settling_time_s = 0.001
 mirror_n_actuators = 97
 
+# poke matrix settings
 poke_command_max = 0.1
 poke_command_min = -0.1
 poke_n_command_steps = 5
 poke_invert_on_demand = False
 
+# control loop settings
 ctrl_dictionary_max_size = 10
-
-loop_n_control_modes = 94 # 94 is default !!! I can change EP
+loop_n_control_modes = 94 # 94 is default for ALPAO
 loop_gain = 0.9
 loop_loss = 0.01
-loop_update_rate = 500.0
+loop_update_rate = 500.0 # deprecated--currently limited by exposure time
 loop_condition_ulim = 1000.
 loop_condition_llim = 1.0
 
+# wavefront reconstruction settings
 n_zernike_terms = 66
 zernike_dioptric_equivalent = 1.5
 

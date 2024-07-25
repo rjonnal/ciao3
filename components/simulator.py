@@ -200,6 +200,7 @@ class Simulator:
         
         self.paused = False
         self.logging = False
+        self.warmup()
 
     def log(self):
         outfn = os.path.join(ccfg.logging_directory,'mirror_%s.txt'%(now_string(True)))
@@ -226,6 +227,19 @@ class Simulator:
         
     def get_command(self):
         return self.command
+
+    def warmup(self,reps=5):
+        try:
+            mirror_warmup_actuators = ccfg.mirror_warmup_actuators
+            currents = np.linspace(ccfg.poke_command_min,ccfg.poke_command_max,ccfg.poke_n_command_steps)
+            for actuator in mirror_warmup_actuators:
+                for rep in range(reps):
+                    for c in currents:
+                        print('Warming up actuator %d, rep %d, current %0.2f.'%(actuator,rep,c))
+                        self.set_actuator(actuator,c)
+            self.flatten()
+        except AttributeError as ae:
+            print('mirror_warmup_actuators not set in ciao_config.py; to run warmup, define this list')
 
     def set_command(self,vec):
         self.command[:] = vec[:]

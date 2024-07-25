@@ -1,9 +1,8 @@
-import centroid
 from matplotlib import pyplot as plt
 import glob,sys,os
 import numpy as np
 from time import time
-import centroid
+from ciao3.components import centroid
 
 image_width = 33
 sb_x_vec = np.array([image_width/2.0-0.5])
@@ -36,10 +35,10 @@ def make_spot(dx=0.0,dy=0.0,sigma=3.0,dc=DC,amplitude=A,noise_gain=1.0):
 
 
 def center_of_mass(spots_image,refx,refy,sb_half_width,do_plot=False):
-    x1 = int(round(refx-sb_half_width))
-    x2 = int(round(refx+sb_half_width))
-    y1 = int(round(refy-sb_half_width))
-    y2 = int(round(refy+sb_half_width))
+    x1 = int(np.round(refx-sb_half_width))
+    x2 = int(np.round(refx+sb_half_width))
+    y1 = int(np.round(refy-sb_half_width))
+    y2 = int(np.round(refy+sb_half_width))
 
     subim = spots_image[y1:y2+1,x1:x2+1]
     v = np.arange(-sb_half_width,sb_half_width+1)
@@ -71,7 +70,7 @@ def fast_centroids(spots_image,sb_x_vec,sb_y_vec,sb_half_width,centroiding_half_
         y2 = int(round(sb_y_vec[spot_index]+sb_half_width))
 
         if verbose:
-            print 'python A',spot_index,x1,x2,y1,y2
+            print(('python A',spot_index,x1,x2,y1,y2))
         
         for y in range(y1,y2+1):
             for x in range(x1,x2+1):
@@ -87,7 +86,7 @@ def fast_centroids(spots_image,sb_x_vec,sb_y_vec,sb_half_width,centroiding_half_
         y2 = int(round(max_y+centroiding_half_width))
 
         if verbose:
-            print 'python B',spot_index,x1,x2,y1,y2
+            print(('python B',spot_index,x1,x2,y1,y2))
         
         xnum = 0.0
         ynum = 0.0
@@ -110,34 +109,7 @@ centroid.fast_centroids(spot,sb_x_vec,sb_y_vec,sb_half_width,centroiding_half_wi
 
 pxout,pyout = fast_centroids(spot,sb_x_vec,sb_y_vec,sb_half_width,centroiding_half_width,verbose=False)
 
-print xcom,ycom
-print xout,yout
-print pxout,pyout
-sys.exit()
+print((xcom,ycom))
+print((xout,yout))
+print((pxout,pyout))
 
-
-centroid.fast_centroids(spots_image,sb_x_vec,sb_y_vec,sb_half_width,centroiding_half_width,xout,yout,max_intensity,valid_vec,0,1)
-pxout,pyout = fast_centroids(spots_image,sb_x_vec,sb_y_vec,sb_half_width,centroiding_half_width)
-
-python_cython_err = (xout-pxout).tolist()+(yout-pyout).tolist()
-if any(python_cython_err):
-    sys.exit('Error between Cython centroiding and Python centroiding. Please fix.')
-else:
-    print 'Cython centroid centers of mass match pure Python calculations.'
-    
-cython_ground_truth_err = (xout-x_spot_location).tolist()+(yout-y_spot_location).tolist()
-if any(cython_ground_truth_err):
-    sys.exit('Error between Cython centroiding and ground truth. Please fix.')
-else:
-    print 'Cython centroid centers of mass match ground truth.'
-
-N = 1000
-t0 = time()
-for k in range(N):
-    centroid.fast_centroids(spots_image,sb_x_vec,sb_y_vec,sb_half_width,centroiding_half_width,xout,yout,max_intensity,valid_vec,0,1)
-
-t_total = time()-t0
-t_iteration = t_total/float(N)
-fps = 1.0/t_iteration
-
-print '%d spots, %d iterations, total time %0.1f, iteration time %0.1e, fps %0.1f'%(n_spots,N,t_total,t_iteration,fps)

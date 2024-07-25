@@ -38,7 +38,7 @@ def iterative_centroid(signal,ref_x,sb_half_width,n_iterations,iteration_step_px
     x = np.arange(len(signal))
     ref_x_temp = ref_x
     for k in range(n_iterations):
-        print ref_x_temp,sb_half_width,k,iteration_step_px
+        print((ref_x_temp,sb_half_width,k,iteration_step_px))
         left = int(round(ref_x_temp-sb_half_width+k*iteration_step_px))
         right = int(round(ref_x_temp+sb_half_width-k*iteration_step_px))
         sig_temp = signal[left:right+1]
@@ -139,54 +139,53 @@ f_sbhw = lambda sbhw: spot_and_com(x0_default,sigma_default,dc_default,
 compare_methods(f_dc,np.arange(0,2500),'DC level (ADU)',x0_default,'DC-related error (spot peak 1000 ADU)')
 compare_methods(f_x0,np.arange(40,60,.1),'spot location',np.arange(40,60,.1),'aberration-dependent error')
 compare_methods(f_sigma,np.arange(.1,10.0,.1),'spot size',x0_default,'spot-size dependent error')
-compare_methods(f_niter,range(1,8),'number of iterations',x0_default,'iteration n error')
-compare_methods(f_sbhw,range(3,12),'search box half width',x0_default,'search box size')
+compare_methods(f_niter,list(range(1,8)),'number of iterations',x0_default,'iteration n error')
+compare_methods(f_sbhw,list(range(3,12)),'search box half width',x0_default,'search box size')
 
 plt.show()
-print f
-sys.exit()
+
 
     
-sigma = 3.0
-fwhm = 2*np.sqrt(2*np.log(2))*sigma
-c_half_width = np.ceil(fwhm)//2
-noise_gain = 1.0
+# sigma = 3.0
+# fwhm = 2*np.sqrt(2*np.log(2))*sigma
+# c_half_width = np.ceil(fwhm)//2
+# noise_gain = 1.0
 
-# test the impact of DC on the three methods
-dc_range = np.arange(0,500)
-results = np.zeros((len(dc_range),3))
-for idx,dc in enumerate(dc_range):
-    x0 = 45.0
-    spot = create_spot(x0=x0,sensor_size=sensor_size,noise_gain=noise_gain,dc=dc,round_output=True,amplitude=1000.0,sigma=3.0)
-    results[idx,0] = centroid(spot)
-    results[idx,1] = iterative_centroid(spot,ref_x,10,3,2) # this leads to a final size of FWHM
-    results[idx,2] = steve_centroid(spot,ref_x,10,c_half_width)
+# # test the impact of DC on the three methods
+# dc_range = np.arange(0,500)
+# results = np.zeros((len(dc_range),3))
+# for idx,dc in enumerate(dc_range):
+#     x0 = 45.0
+#     spot = create_spot(x0=x0,sensor_size=sensor_size,noise_gain=noise_gain,dc=dc,round_output=True,amplitude=1000.0,sigma=3.0)
+#     results[idx,0] = centroid(spot)
+#     results[idx,1] = iterative_centroid(spot,ref_x,10,3,2) # this leads to a final size of FWHM
+#     results[idx,2] = steve_centroid(spot,ref_x,10,c_half_width)
 
-plt.plot(dc_range,results)
-plt.legend(labels)
+# plt.plot(dc_range,results)
+# plt.legend(labels)
 
-# test the impact of DC on the three methods
-x0_range = np.arange(40.0,60.0,.05)
-results = np.zeros((len(x0_range),3))
-for idx,x0 in enumerate(x0_range):
-    spot = create_spot(x0=x0,sensor_size=sensor_size,noise_gain=noise_gain,dc=100.0,round_output=True,amplitude=1000.0,sigma=3.0)
-    results[idx,0] = centroid(spot)
-    results[idx,1] = iterative_centroid(spot,ref_x,10,3,2) # this leads to a final size of FWHM
-    results[idx,2] = steve_centroid(spot,ref_x,10,c_half_width)
+# # test the impact of DC on the three methods
+# x0_range = np.arange(40.0,60.0,.05)
+# results = np.zeros((len(x0_range),3))
+# for idx,x0 in enumerate(x0_range):
+#     spot = create_spot(x0=x0,sensor_size=sensor_size,noise_gain=noise_gain,dc=100.0,round_output=True,amplitude=1000.0,sigma=3.0)
+#     results[idx,0] = centroid(spot)
+#     results[idx,1] = iterative_centroid(spot,ref_x,10,3,2) # this leads to a final size of FWHM
+#     results[idx,2] = steve_centroid(spot,ref_x,10,c_half_width)
 
-plt.figure()
-plt.plot(x0_range-ref_x,(results.T-x0_range).T)
-plt.legend(labels)
-
-
+# plt.figure()
+# plt.plot(x0_range-ref_x,(results.T-x0_range).T)
+# plt.legend(labels)
 
 
 
 
 
 
-plt.show()
+
+
+# plt.show()
 
 
 
-sys.exit()
+# sys.exit()
