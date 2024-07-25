@@ -43,13 +43,13 @@ save_poke_matrix_spots_images = True
 
 # sensor settings:
 reference_n_measurements = 10
-lenslet_pitch_m = 300e-6
-lenslet_focal_length_m = 14.6e-3
+lenslet_pitch_m = 500e-6
+lenslet_focal_length_m = 30e-3
 pixel_size_m = 5.5e-6
 
-beam_diameter_m = 9e-3
+beam_diameter_m = 10e-3
 interface_scale_factor = 0.75
-wavelength_m = 755e-9
+wavelength_m = 855e-9
 
 # use_dark_subtraction provides UI control to acquire a dark image and then
 # subtract it from each acquired frame. It can be used in conjunction with

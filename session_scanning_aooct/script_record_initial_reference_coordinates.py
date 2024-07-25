@@ -1,10 +1,10 @@
 import sys,os
 sys.path.append(os.path.split(__file__)[0])
-from ciao import cameras,simulator
+from ciao3.components import cameras,simulator
 import ciao_config as ccfg
 from matplotlib import pyplot as plt
 import numpy as np
-from ciao import tools
+from ciao3.components import tools
 
 # Call this with 'python record_reference_coordinages.py output_filename.txt'
 
@@ -33,7 +33,7 @@ else:
 output_filename = sys.argv[1]
 
 # collect and average N images
-im = cam.get_image().astype(np.float)
+im = cam.get_image().astype(float)
 for k in range(N-1):
     im = im + cam.get_image()
 im = im/float(N)

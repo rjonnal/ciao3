@@ -861,6 +861,7 @@ class UI(QWidget):
         
         other_layout.addWidget(self.pb_poke)
         other_layout.addWidget(self.pb_pseudocalibrate)
+        other_layout.addWidget(self.pb_record_reference)
         other_layout.addWidget(self.pb_quit)
 
         column_2.addLayout(other_layout)
