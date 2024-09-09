@@ -17,6 +17,9 @@ class SearchBoxes(QObject):
         self.half_width = half_width
         self.xmax = ccfg.image_width_px - 1
         self.ymax = ccfg.image_height_px - 1
+
+        # reference coordinates are floating point, measured using a reference beam and center-of-mass
+        # search box edges must be integers, so we round and cast as np.int16
         self.x1 = np.round(self.x - self.half_width).astype(np.int16)
         self.x2 = np.round(self.x + self.half_width).astype(np.int16)
         self.y1 = np.round(self.y - self.half_width).astype(np.int16)
