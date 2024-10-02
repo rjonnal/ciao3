@@ -324,32 +324,64 @@ class Loop(QObject):
         return out
             
     def run_poke(self):
+
+        # Set the min and max actuator currents used to measure the poke
+        # matrix, specified in the ciao_config.py file:
         cmin = ccfg.poke_command_min
         cmax = ccfg.poke_command_max
+
+        # Set the number of steps to take between the min and max currents,
+        # and the subsequent vector of currents:
         n_commands = ccfg.poke_n_command_steps
         commands = np.linspace(cmin,cmax,n_commands)
 
         self.pause()
         time.sleep(1)
-        
+
+        # Set up matrices to hold the result of the poke measurement.
+        # These will have to be L x A x C in size, where L is the
+        # number of lenslets, A is the number of actuators, and C is
+        # the number of test currents. We need two of these initially,
+        # one for x slopes and one for y slopes, though later we'll
+        # stack these on top of one another for saving and inverting.
+
         n_lenslets = self.sensor.n_lenslets
         n_actuators = self.mirror.n_actuators
         
         x_mat = np.zeros((n_lenslets,n_actuators,n_commands))
         y_mat = np.zeros((n_lenslets,n_actuators,n_commands))
+        
         ns = now_string()
         flat = self.mirror.flat
-        
+
+        # Iterate through the actuator indices, e.g. 0 to 96.
         for k_actuator in range(n_actuators):
+
+            # Flatten the mirror. [RSJ: maybe we should do this after every
+            # command, i.e. in the inner loop?]
+            
             self.mirror.flatten()
+
+            # Iterate through the number of actuator commands.
             for k_command in range(n_commands):
+                # The current to be sent to the actuator should be
+                # relative to the flat current; normally this would
+                # be 0.0, but there may be odd circumstances when it's
+                # non-zero.
                 cur = commands[k_command]+flat[k_actuator]
-                #print k_actuator,cur
+
+                # Set the actuator current.
                 self.mirror.set_actuator(k_actuator,cur)
-                #print k_actuator,k_command
+
+                # Wait a bit to let the actuator settle.
                 QApplication.processEvents()
                 time.sleep(.01)
+
+                # Collect one SHWS measurement:
                 self.sensor.sense()
+
+                # If cfg specifies, save the spots images during generation of
+                # the poke matrix. This is slow and will generate a *lot* of data.
                 try:
                     if ccfg.save_poke_matrix_spots_images:
                         spots_folder = os.path.join(ccfg.poke_directory,'%s_spots_images'%ns)
@@ -362,20 +394,40 @@ class Loop(QObject):
                     print(ae)
                     pass
                         
+                # Now fill the sensor's x_slopes and y_slopes
+                # vectors with the just measured wavefront slopes.
                 x_mat[:,k_actuator,k_command] = self.sensor.x_slopes
                 y_mat[:,k_actuator,k_command] = self.sensor.y_slopes
                 self.finished.emit()
-        # print 'done'
+                
         self.mirror.flatten()
-        
+
+
+        # After the poke matrix measurement, we have two matrices of size
+        # L x A x C, where L is the number of lenslets, A is the number of
+        # actuators, and C is the number of currents used to measure influence.
+        # The next step is to determine the slope/gain of the coupling between
+        # each actuator and each lenslet.
+
+        # First, we compute the diff (numerical derivative) of the current
+        # vector:
         d_commands = np.mean(np.diff(commands))
-        d_x_mat = np.diff(x_mat,axis=2)
+
+        # Next, we compute the x and y direction derivatives of the slope
+        # vectors, w/r/t current:
+        d_x_mat = np.diff(x_mat,axis=2) # axis 2 is the current axis
         d_y_mat = np.diff(y_mat,axis=2)
 
+        # Next, we divide the slope derivatives by the current derivative
+        # (or current step) and take the average.
         x_response = np.mean(d_x_mat/d_commands,axis=2)
         y_response = np.mean(d_y_mat/d_commands,axis=2)
-        poke = np.vstack((x_response,y_response))
 
+        # x_response and y_response matrices have shape L x A
+        # units of response matrices are rad/ampere. We stack
+        # these vertically, so we have one matrix:
+        poke = np.vstack((x_response,y_response))
+        # The poke matrix now has shape 2L x A.
 
         # After we make a new poke matrix, we will save it in
         # two files: an archive file that can be used to keep

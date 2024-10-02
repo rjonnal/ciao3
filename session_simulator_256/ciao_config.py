@@ -68,7 +68,7 @@ mirror_command_max = 1.0
 mirror_command_min = -1.0
 mirror_settling_time_s = 0.001
 mirror_n_actuators = 97
-mirror_warmup_actuators = [80,81,82]
+mirror_warmup_actuators = []#[80,81,82]
 
 poke_command_max = 0.1
 poke_command_min = -0.1

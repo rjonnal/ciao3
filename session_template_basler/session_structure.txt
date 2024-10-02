@@ -1,0 +1,122 @@
+.
+├── ciao_config.py
+├── CIAO_log_reading.ipynb
+├── etc
+│   ├── audio
+│   │   ├── A_1.wav
+│   │   ├── A_2.wav
+│   │   ├── A_3.wav
+│   │   ├── A_4.wav
+│   │   ├── A_5.wav
+│   │   ├── A_6.wav
+│   │   ├── A_sharp_1.wav
+│   │   ├── A_sharp_2.wav
+│   │   ├── A_sharp_3.wav
+│   │   ├── A_sharp_4.wav
+│   │   ├── A_sharp_5.wav
+│   │   ├── A_sharp_6.wav
+│   │   ├── B_1.wav
+│   │   ├── B_2.wav
+│   │   ├── B_3.wav
+│   │   ├── B_4.wav
+│   │   ├── B_5.wav
+│   │   ├── B_6.wav
+│   │   ├── C_1.wav
+│   │   ├── C_2.wav
+│   │   ├── C_3.wav
+│   │   ├── C_4.wav
+│   │   ├── C_5.wav
+│   │   ├── C_6.wav
+│   │   ├── C_sharp_1.wav
+│   │   ├── C_sharp_2.wav
+│   │   ├── C_sharp_3.wav
+│   │   ├── C_sharp_4.wav
+│   │   ├── C_sharp_5.wav
+│   │   ├── C_sharp_6.wav
+│   │   ├── D_1.wav
+│   │   ├── D_2.wav
+│   │   ├── D_3.wav
+│   │   ├── D_4.wav
+│   │   ├── D_5.wav
+│   │   ├── D_6.wav
+│   │   ├── D_sharp_1.wav
+│   │   ├── D_sharp_2.wav
+│   │   ├── D_sharp_3.wav
+│   │   ├── D_sharp_4.wav
+│   │   ├── D_sharp_5.wav
+│   │   ├── D_sharp_6.wav
+│   │   ├── E_1.wav
+│   │   ├── E_2.wav
+│   │   ├── E_3.wav
+│   │   ├── E_4.wav
+│   │   ├── E_5.wav
+│   │   ├── E_6.wav
+│   │   ├── F_1.wav
+│   │   ├── F_2.wav
+│   │   ├── F_3.wav
+│   │   ├── F_4.wav
+│   │   ├── F_5.wav
+│   │   ├── F_6.wav
+│   │   ├── F_sharp_1.wav
+│   │   ├── F_sharp_2.wav
+│   │   ├── F_sharp_3.wav
+│   │   ├── F_sharp_4.wav
+│   │   ├── F_sharp_5.wav
+│   │   ├── F_sharp_6.wav
+│   │   ├── G_1.wav
+│   │   ├── G_2.wav
+│   │   ├── G_3.wav
+│   │   ├── G_4.wav
+│   │   ├── G_5.wav
+│   │   ├── G_6.wav
+│   │   ├── G_sharp_1.wav
+│   │   ├── G_sharp_2.wav
+│   │   ├── G_sharp_3.wav
+│   │   ├── G_sharp_4.wav
+│   │   ├── G_sharp_5.wav
+│   │   └── G_sharp_6.wav
+│   ├── ctrl
+│   │   ├── 20231228153418_currents.txt
+│   │   ├── 20231228153418_modes.pdf
+│   │   ├── 20231228153418_poke.txt
+│   │   └── poke.txt
+│   ├── dm
+│   │   ├── flat.txt
+│   │   └── mirror_mask.txt
+│   └── ref
+│       ├── reference_initial.txt
+│       ├── reference_mask.txt
+│       ├── reference.txt
+│       └── zernike_polynomials.pdf
+├── icons
+│   └── ciao.png
+├── Lib64
+│   ├── asdk310.py
+│   ├── _asdk310.pyd
+│   ├── asdk311.py
+│   ├── _asdk311.pyd
+│   ├── asdk37.py
+│   ├── _asdk37.pyd
+│   ├── asdk38.py
+│   ├── _asdk38.pyd
+│   ├── _asdk38.so
+│   ├── asdk39.py
+│   ├── _asdk39.pyd
+│   ├── ASDK.dll
+│   ├── asdk.py
+│   ├── __init__.py
+│   └── libcurl.dll
+├── script_characterize_lenslets.py
+├── script_check_calibration.py
+├── script_initialize.py
+├── script_make_beeps.py
+├── script_make_mask.py
+├── script_pseudocalibrate.py
+├── script_record_initial_reference_coordinates.py
+├── script_wiggle_actuators.py
+├── session_structure.txt
+├── shws_pseudocalibration.ipynb
+├── ui_ciao.py
+└── ui_mirror.py
+
+8 directories, 112 files
