@@ -28,7 +28,7 @@ init_exposure_time = 10000
 init_spotsmin = 100
 init_spotsmax = 2048
 
-bins = np.arange(0,4095,16)
+bins = np.arange(0,4100,16)
 bin_centers = (bins[:-1]+bins[1:])/2.0
 
 def f(cam):
@@ -131,6 +131,7 @@ def update(val):
     vline.set_ydata(vprof)
     histline.set_ydata(hist)
     spotsimage.set_clim((spotsmin_slider.val,spotsmax_slider.val))
+    spotsimage.set_data(spots)
     fig.canvas.draw_idle()
 
 
