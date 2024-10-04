@@ -500,6 +500,7 @@ class Sensor:
                                     verbose_p = 0,
                                     num_threads_p = 1)
         self.centroiding_time = time.time()-t0
+        
         self.x_slopes = (self.x_centroids-self.search_boxes.x)*self.pixel_size_m/self.lenslet_focal_length_m
         self.y_slopes = (self.y_centroids-self.search_boxes.y)*self.pixel_size_m/self.lenslet_focal_length_m
         

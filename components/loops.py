@@ -181,6 +181,7 @@ class Loop(QObject):
 
 
                 lenslets_changed = not all(self.active_lenslets==current_active_lenslets)
+
                 all_lenslets_active = np.sum(current_active_lenslets)==self.sensor.n_lenslets
                 # if the lenslets have changed, we have two options:
                 # 1. if they're not all active, and ccfg.poke_invert_on_demand
@@ -216,6 +217,7 @@ class Loop(QObject):
                     print('rms'+'.'*pcount)
 
                 if self.ready_to_correct:
+                    
                     slope_vec = np.hstack((xs,ys))
                     command = self.gain * np.dot(self.poke.ctrl,slope_vec)
 
