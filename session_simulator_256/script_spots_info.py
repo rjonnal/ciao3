@@ -31,29 +31,28 @@ spots_x = sx//2
 spots_y = sy//2
 padding=10
 
-bins = np.arange(0,4100,16)
-bin_centers = (bins[:-1]+bins[1:])/2.0
-
-def f(cam):
+def f(cam,minval,maxval):
     im = cam.get_image().astype(float)
     hprof = np.mean(im,axis=0)
     vprof = np.mean(im,axis=1)
+    bins = np.linspace(minval,maxval,64)
     hist,_ = np.histogram(im[::4,::4].ravel(),bins)
-    return hprof,vprof,hist,im
+    bin_centers = (bins[:-1]+bins[1:])/2.0
+    return hprof,vprof,hist,bin_centers,im
 
 # Create the figure and the line that we will manipulate
 
-fig, ((hax, vax, sshprof), (histax, spotsax, ssvprof)) = plt.subplots(2,3)
+fig, ((hax, vax, sshax), (histax, spotsax, ssvax)) = plt.subplots(2,3)
 fig.set_figwidth(12)
 fig.set_figheight(8)
 
-hprof,vprof,hist,spots = f(cam)
+hprof,vprof,hist,bin_centers,spots = f(cam,init_spotsmin,init_spotsmax)
 
 hline, = hax.plot(hpos,hprof,lw=2)
 vline, = vax.plot(vpos,vprof,lw=2)
 
-sshline, = sshprof.plot(np.arange(2*padding)-padding,np.arange(2*padding))
-ssvline, = ssvprof.plot(np.arange(2*padding)-padding,np.arange(2*padding))
+sshline, = sshax.plot(np.arange(2*padding)-padding,np.arange(2*padding))
+ssvline, = ssvax.plot(np.arange(2*padding)-padding,np.arange(2*padding))
 
 
 histline, = histax.semilogy(bin_centers,hist,lw=2)
@@ -113,7 +112,7 @@ ymax_slider = Slider(
 axspotsmin = fig.add_axes([0.05, 0.15, 0.01, 0.23])
 spotsmin_slider = Slider(
     ax=axspotsmin,
-    label="spotsmin",
+    label="immin",
     valmin=0,
     valmax=4095,
     valinit=init_spotsmin,
@@ -123,18 +122,26 @@ spotsmin_slider = Slider(
 axspotsmax = fig.add_axes([0.09, 0.15, 0.01, 0.23])
 spotsmax_slider = Slider(
     ax=axspotsmax,
-    label="spotsmax",
+    label="immax",
     valmin=0,
     valmax=4095,
     valinit=init_spotsmax,
     orientation="vertical"
 )
 
+def profile_properties(x,profile):
+    maxval = np.mean(sorted(profile)[-3:])
+    profile = profile/np.max(profile)
+    vals = x**2/(-2*np.log(profile))
+    valid = np.where(vals>=0)
+    vals = vals[valid]
+    sigma = np.nanmean(np.sqrt(vals))
+    return maxval,sigma
 
 # The function to be called anytime a slider's value changes
 def update(val):
     cam.set_exposure(int(exp_slider.val))
-    hprof,vprof,hist,spots = f(cam)
+    hprof,vprof,hist,bin_centers,spots = f(cam,spotsmin_slider.val,spotsmax_slider.val)
 
     temp = np.zeros(spots.shape)
     temp[spots_y-5:spots_y+5,spots_x-5:spots_x+5] = spots[spots_y-5:spots_y+5,spots_x-5:spots_x+5]
@@ -143,12 +150,16 @@ def update(val):
 
     hspotprof = spots[peaky,peakx-padding:peakx+padding]
     vspotprof = spots[peaky-padding:peaky+padding,peakx]
-    print(hspotprof.shape)
-    print(vspotprof.shape)
-    sshprof.set_xlim((-padding,padding))
-    ssvprof.set_xlim((-padding,padding))
-    sshprof.set_ylim((spotsmin_slider.val,spotsmax_slider.val))
-    ssvprof.set_ylim((spotsmin_slider.val,spotsmax_slider.val))
+
+    x = np.arange(-padding,padding)
+    sshax.set_title('max=%0.1f, $\sigma=%0.1f$'%profile_properties(x,hspotprof),fontsize=18)
+    ssvax.set_title('max=%0.1f, $\sigma=%0.1f$'%profile_properties(x,vspotprof),fontsize=18)
+
+    
+    sshax.set_xlim((-padding,padding))
+    ssvax.set_xlim((-padding,padding))
+    sshax.set_ylim((spotsmin_slider.val,spotsmax_slider.val))
+    ssvax.set_ylim((spotsmin_slider.val,spotsmax_slider.val))
     
     hax.set_ylim((ymin_slider.val,ymax_slider.val))
     vax.set_ylim((ymin_slider.val,ymax_slider.val))
@@ -159,6 +170,7 @@ def update(val):
     
     hline.set_ydata(hprof)
     vline.set_ydata(vprof)
+    histline.set_xdata(bin_centers)
     histline.set_ydata(hist)
     
     spotsimage.set_clim((spotsmin_slider.val,spotsmax_slider.val))
@@ -186,9 +198,9 @@ button.on_clicked(quit)
 def onclick(event):
     global spots_x,spots_y
     if event.xdata != None and event.ydata != None:
-        print(event.xdata, event.ydata)
-        spots_x = int(round(event.xdata))
-        spots_y = int(round(event.ydata))
+        if event.inaxes==spotsax:
+            spots_x = int(round(event.xdata))
+            spots_y = int(round(event.ydata))
 
 cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
