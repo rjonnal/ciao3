@@ -415,6 +415,7 @@ class Reconstructor:
         
         #why did I originally write it this way?
         #self.matrix = np.dot(np.linalg.pinv(np.dot(A.T,A)),A.T)
+        # LS fitting classic formula is ((X X^T)^-1 X^T)
 
         # a matrix for converting slopes into zernike coefficients:
         self.zernike_matrix = np.linalg.pinv(A)

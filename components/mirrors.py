@@ -84,8 +84,21 @@ class MirrorControllerPython(MirrorController):
     def send(self):
         self.clip()
         return self.dm.Send(self.command)
+
+class MirrorControllerDummy(MirrorController):
+    def __init__(self):
+        self.mirror_id = ccfg.mirror_id
+        super(MirrorControllerDummy,self).__init__()        
         
+        self.command[:] = 0.0 # this doesn't really matter
         
+    def set(self,vec):
+        self.command[:] = vec[:]
+        
+    def send(self):
+        self.clip()
+        return 1
+
 class MirrorControllerPythonOld(MirrorController):
 
     def __init__(self):
@@ -112,7 +125,7 @@ class MirrorControllerPythonOld(MirrorController):
         
         
 class Mirror:
-    def __init__(self):
+    def __init__(self,dummy=False):
         
         # try:
         #     self.controller = MirrorControllerPython()
@@ -131,7 +144,10 @@ class Mirror:
         #             print(e)
         #             print('No mirror driver found. Using virtual mirror.')
         #             self.controller = MirrorController()
-        self.controller = MirrorControllerPython()
+        if dummy:
+            self.controller = MirrorControllerDummy()
+        else:
+            self.controller = MirrorControllerPython()
         self.mirror_mask = np.loadtxt(ccfg.mirror_mask_filename)
         self.n_actuators = ccfg.mirror_n_actuators
         self.flat = np.loadtxt(ccfg.mirror_flat_filename)

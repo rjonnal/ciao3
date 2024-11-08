@@ -11,6 +11,11 @@ try:
     from ximea import xiapi
 except Exception as e:
     print(e)
+
+try:
+    from pyueye import ueye
+except Exception as e:
+    print(e)
     
 from ctypes import *
 from ctypes.util import find_library
@@ -23,10 +28,14 @@ def get_camera():
         return AOCameraAce()
     elif ccfg.camera_id.lower()=='ximea':
         return XimeaCamera()
+    elif ccfg.camera_id.lower()=='ueye':
+        return UeyeCamera()
     else:
         return SimulatedCamera()
 
 
+
+    
 class PylonCamera:
 
     def __init__(self,timeout=500):
@@ -61,6 +70,84 @@ class PylonCamera:
         return int(self.camera.ExposureTime.Value)
     
 
+class UeyeCamera:
+
+    def __init__(self,timeout=500):
+        hCam = ueye.HIDS(0)
+        nRet = ueye.is_InitCamera(hCam, None)
+        if nRet != ueye.IS_SUCCESS:
+            print("UEYE error: is_InitCamera ERROR")
+
+        cInfo = ueye.CAMINFO()
+        sInfo = ueye.SENSORINFO()
+        self.pcImageMemory = ueye.c_mem_p()
+        MemID = ueye.int()
+        rectAOI = ueye.IS_RECT()
+        self.pitch = ueye.INT()
+
+        
+        # Reads out the data hard-coded in the non-volatile camera memory and writes it to the data structure that cInfo points to
+        nRet = ueye.is_GetCameraInfo(hCam, cInfo)
+        if nRet != ueye.IS_SUCCESS:
+            print("is_GetCameraInfo ERROR")
+
+        # You can query additional information about the sensor type used in the camera
+        nRet = ueye.is_GetSensorInfo(hCam, sInfo)
+        if nRet != ueye.IS_SUCCESS:
+            print("is_GetSensorInfo ERROR")
+
+        nRet = ueye.is_ResetToDefault( hCam)
+        if nRet != ueye.IS_SUCCESS:
+            print("is_ResetToDefault ERROR")
+
+        m_nColorMode = ueye.IS_CM_MONO8
+        self.nBitsPerPixel = ueye.INT(8)
+        self.bytes_per_pixel = int(self.nBitsPerPixel / 8)
+
+        # Can be used to set the size and position of an "area of interest"(AOI) within an
+        nRet = ueye.is_AOI(hCam, ueye.IS_AOI_IMAGE_GET_AOI, rectAOI, ueye.sizeof(rectAOI))
+        if nRet != ueye.IS_SUCCESS:
+            print("is_AOI ERROR")
+
+        self.width = rectAOI.s32Width
+        self.height = rectAOI.s32Height
+
+        # Allocates an image memory for an image having its dimensions defined by width and height and its color depth defined by nBitsPerPixel
+        nRet = ueye.is_AllocImageMem(hCam, self.width, self.height, self.nBitsPerPixel, self.pcImageMemory, MemID)
+        if nRet != ueye.IS_SUCCESS:
+            print("is_AllocImageMem ERROR")
+        else:
+            # Makes the specified image memory the active memory
+            nRet = ueye.is_SetImageMem(hCam, self.pcImageMemory, MemID)
+            if nRet != ueye.IS_SUCCESS:
+                print("is_SetImageMem ERROR")
+            else:
+                # Set the desired color mode
+                nRet = ueye.is_SetColorMode(hCam, m_nColorMode)
+
+        # Activates the camera's live video mode (free run mode)
+        nRet = ueye.is_CaptureVideo(hCam, ueye.IS_DONT_WAIT)
+        if nRet != ueye.IS_SUCCESS:
+            print("is_CaptureVideo ERROR")
+
+    def get_image(self):
+        
+        array = ueye.get_data(self.pcImageMemory, self.width, self.height, self.nBitsPerPixel, self.pitch, copy=False)
+        self.image = np.reshape(array,(self.height.value, self.width.value, self.bytes_per_pixel))
+        return self.image
+    
+    def close(self):
+        return
+
+    def set_exposure(self,exposure_us):
+        #self.camera.ExposureTime.Value = float(exposure_us)
+        return
+        
+    def get_exposure(self):
+        return 1
+        #return int(self.camera.ExposureTime.Value)
+
+    
 class XimeaCamera:
 
     def __init__(self,timeout=500):

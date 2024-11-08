@@ -1,0 +1,5 @@
+import numpy as np
+from matplotlib import pyplot as plt
+
+ref = np.loadtxt('reference.txt')
+print(ref)
