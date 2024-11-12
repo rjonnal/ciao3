@@ -70,7 +70,14 @@ The instructions below contain minimal instructions for getting started with a C
 
 ### Compiling the centroiding algorithm
 
-As of now, the only real-time algorithm that is substantially slower in pure Python than compiled C is the background-estimation and center-of-mass calculation. Thus this step has been implemented in compiled C via [Cython](https://cython.readthedocs.io/en/latest/). In a perfect world, installation of a C compiler such as gcc or Visual C++ compiler combined with installation of cython via conda (as described above) will just make Cython work correctly.
+As of now, the only real-time algorithm that is substantially slower in pure Python than compiled C is the background-estimation and center-of-mass calculation. Almost everything in CIAO could be written in Python using the Numpy library, with adequate performance for typical AO loops (20-30 Hz). However, in the interest of speeding things up, the costliest operation--centroiding the spots in the Shack-Hartmann image--has been moved down into a C-extension written using Cython[Cython](https://cython.readthedocs.io/en/latest/). In a perfect world, installation of a C compiler such as gcc or Visual C++ compiler combined with installation of cython via conda (as described above) will just make Cython work correctly.
+
+To compile the Cython code, navigate to the ```ciao3/components/centroid_cython``` folder and issue the following command: `python setup.py build_ext --inplace`.
+
+You may see some warnings (e.g. about deprecation of Numpy features), but shouldn't see any errors. After that, copy the new `.so` or `.pyd` file into the `ciao/components/` folder and rename it `centroid.so` or `centroid.pyd`.
+
+
+
 
 To compile the
 
