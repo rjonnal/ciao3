@@ -47,7 +47,7 @@ class Zernike:
         return np.int(n*(n+1)/2.0+(n+m)/2.0)
 
     def zeqn(self,n,m,kind='h',forceRecompute=False):
-        """Return parameters sufficient for specifying a Zernike term
+        r"""Return parameters sufficient for specifying a Zernike term
         of desired order and azimuthal frequency.
 
         Given an order (or degree) n and azimuthal frequency f, and x-
@@ -268,7 +268,7 @@ class Zernike:
         return self.get_surface(n,m,X,Y,kind,mask)
     
     def get_surface(self,n,m,X,Y,kind='h',mask=None):
-        """Return a phase map specified by a Zernike order and azimuthal frequency.
+        r"""Return a phase map specified by a Zernike order and azimuthal frequency.
 
         Given an order (or degree) n and azimuthal frequency f, and x- and y-
         rectangular (Cartesian) coordinates, produce a phase map of either height,

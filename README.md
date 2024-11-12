@@ -51,16 +51,19 @@ By default, any session whose name begins with ```local_session_``` will not be 
 
 The instructions below contain minimal instructions for getting started with a CIAO simulation session. If you are new to Anaconda or Miniconda, please read [this introduction](https://docs.conda.io/projects/conda/en/23.3.x/user-guide/getting-started.html).
 
-1. Create a `ciao` virtual environment in Anaconda. At the conda terminal, type: `conda create --name ciao3`.
+1. Create a `ciao` virtual environment in Anaconda. At the conda terminal, type: `conda create --name ciao3 python=3.12`. We are installing version 3.12 because it's the last version of Python tested against. CIAO will probably run on newer versions of Python too.
 
-2. Activate the `ciao3` environment: `conda activate ciao3`.
+2. Activate the `ciao3` environment: `conda activate ciao3`. You will have to activate this environment any time you want to run CIAO or its components.
 
-3. Install Python in the `ciao3` environment: `conda install python`. This will install the latest version of Python.
+3. Verify Python version in the `ciao3` environment: `python --version`.
 
-4. CIAO depends on the following packages:
-```
-
-```
+4. CIAO depends on the following conda packages:
+    ```
+	matplotlib
+	numpy
+	scipy
+	psutil
+    ```
 
 These prerequisites assume you are using the default hardware (Alpao mirror and a SHWS based on a Basler Ace USB3 camera).
 
