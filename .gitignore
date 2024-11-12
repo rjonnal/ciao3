@@ -12,6 +12,9 @@ log/
 *.npy
 *.mat
 *.wav
+*.so
+*.pyd
+*.c
 
 # Local sessions #
 ##################
