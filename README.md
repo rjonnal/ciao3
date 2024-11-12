@@ -9,9 +9,58 @@ These are the prerequisites for installing a version of the software which allow
 
 1. Install [emacs](https://www.gnu.org/software/emacs/), [Notepad++](https://notepad-plus-plus.org/download), or another editor.
 2. Install [Git](https://git-scm.com/download/)
-3. Install [Anaconda for Python 3.8+](https://www.anaconda.com/download#downloads)
+3. Install [Anaconda for Python 3.X+](https://www.anaconda.com/download#downloads)
 4. If you're using Windows, install the [Visual C++ compiler for Python](https://wiki.python.org/moin/WindowsCompilers). Make sure you get the right version for your Anaconda Python install. In Linux, gcc will be invoked instead; it's probably already installed on your system, but you can verify that it is with ```gcc --version```.
-5. If necessary, create a directory where your Python libraries will reside, and add that directory to the environment variable `PYTHONPATH`. Clone this repository into that directory: `git clone https://github.com/rjonnal/ciao3`.
+5. If necessary, create a directory where your Python libraries will reside, and add that directory to the environment variable `PYTHONPATH`. Clone this repository into that directory: `git clone https://github.com/rjonnal/ciao3`. In our lab we use the locations `C:\code` (Windows) and `/home/USER/code` (Linux) as a rule.
+
+## Sessions
+
+### CIAO sessions and ```ciao_config.py```
+
+CIAO depends on a notion of a *session*, which allows multiple configurations to be installed on the same computer. For instance, it may be useful to have a closed-loop session, a wavefront sensing session (e.g., for system alignment with a separate, calibrated sensor), and a simulation session, all on one computer. Each session requires a dedicated folder/directory, and a dedicated ```ciao_config.py``` file which specifies all of the relevant parameters of the session. CIAO has many tools, and there is a broad variety of use cases, some covered below; however, the three main ways to use CIAO are 1) as part of a GUI-based program for wavefront sensing or correction, where real-time feedback is critical; 2) as part of a script to calibrate the system or make measurements; 3) in a [Jupyter](https://jupyter.org/) notebook designed for instruction or documentation. By convention, these programs are prefaced with ```ui_```, ```script_```, and ```nb_``` respectively. These scripts must all be located in the session folder, alongside ```ciao_config.py```.
+
+The advantage of this approach is that once things are configured correctly, the sessions can be run without modifications, even simultaneously (notwithstanding device driver conflicts). A disadvantage of this approach is that the top level programs scripts must add their filesystem locations to the Python path at runtime, because the rest of CIAO will all need access to the same ```ciao_config.py``` file, and attempt to import it. A related disadvantage is that users should be careful to avoid putting copies of ```ciao_config.py``` elsewhere, e.g. in the ```components``` directory or in any folder in the Python path, where they could in principle be loaded instead of the correct file for the session. Session directories should also never be added to the Python path environment variable `PYTHONPATH`, as this could result in the loading of incorrect versions of ```ciao_config.py```. (See **Design considerations** below for alternative approaches which were not pursued but may be preferable).
+
+In short, every top level script must begin with the following two lines:
+
+    import sys,os
+    sys.path.append(os.path.split(__file__)[0])
+
+### ```session_template``` folder
+
+The default installation contains several folders called ```session_template_XXXX```, which can be copied to create new sessions. This template contains at least the following files:
+
+    ciao_config.py
+    script_initialize.py
+    script_make_mask.py
+    script_record_reference_coordinates.py
+    ui_ciao.py
+    
+1. ```ciao_config.py``` is the session's configuration file, containing all of the parameters of the session's system, either real or simulated.
+2. ```script_initialize.py``` is used to initialize a session--to create the required folders and assist in creating other calibration files.
+3. ```script_make_mask.py``` is used to generate mask files for the SHWS and DM (see "Creating mask files" below).
+4. ```script_record_initial_reference_coordinates.py``` is used to generate ballpark reference coordinates which can then be used to bootstrap precise reference coordinates. The problem is that we need search boxes before we can compute the centroids of reference beam spots, but we need centroids of the reference beam spots in order to position search boxes. This script attempts to guess the initial locations of search boxes based on the spots image, and permits a bit of interactive adjustment of those coordinates.
+5. ```ui_ciao.py``` launches the closed-loop GUI.
+
+### Local sessions
+
+By default, any session whose name begins with ```local_session_``` will not be pushed into or pulled from the Git repository. This is a convenient way to guard against accidental collisions between local sessions and those stored in the repo.
+
+
+## Quick start
+
+The instructions below contain minimal instructions for getting started with a CIAO simulation session. If you are new to Anaconda or Miniconda, please read [this introduction](https://docs.conda.io/projects/conda/en/23.3.x/user-guide/getting-started.html).
+
+1. Create a `ciao` virtual environment in Anaconda. At the conda terminal, type: `conda create --name ciao3`.
+
+2. Activate the `ciao3` environment: `conda activate ciao3`.
+
+3. Install Python in the `ciao3` environment: `conda install python`. This will install the latest version of Python.
+
+4. CIAO depends on the following packages:
+```
+
+```
 
 These prerequisites assume you are using the default hardware (Alpao mirror and a SHWS based on a Basler Ace USB3 camera).
 
@@ -80,37 +129,7 @@ If you have a planar reference wavefront incident on the SHWS and would like to 
 
 # Slow start
 
-## CIAO sessions and ```ciao_config.py```
 
-CIAO depends on a notion of a *session*, which allows multiple configurations to be installed on the same computer. For instance, it may be useful to have a closed-loop session, a wavefront sensing session (e.g., for system alignment with a separate, calibrated sensor), and a simulation session, all on one computer. Each session requires a dedicated folder/directory, and a dedicated ```ciao_config.py``` file which specifies all of the relevant parameters of the session. CIAO has many tools, and there is a broad variety of use cases, some covered below; however, the three main ways to use CIAO are 1) as part of a GUI-based program for wavefront sensing or correction, where real-time feedback is critical; 2) as part of a script to calibrate the system or make measurements; 3) in a [Jupyter](https://jupyter.org/) notebook designed for instruction or documentation. By convention, these programs are prefaced with ```ui_```, ```script_```, and ```nb_``` respectively. These scripts must all be located in the session folder, alongside ```ciao_config.py```.
-
-The advantage of this approach is that once things are configured correctly, the sessions can be run without modifications, even simultaneously (notwithstanding device driver conflicts). A disadvantage of this approach is that the top level programs scripts must add their filesystem locations to the Python path at runtime, because the rest of CIAO will all need access to the same ```ciao_config.py``` file, and attempt to import it. A related disadvantage is that users should be careful to avoid putting copies of ```ciao_config.py``` elsewhere, e.g. in the ```components``` directory or in any folder in the Python path, where it could in principle be loaded instead of the correct file for the session. Session directories should also never be added to the Python path, as this could result in the loading of incorrect versions of ```ciao_config.py```. (See **Design considerations** below for alternative approaches which were not pursued but may be preferable).
-
-In short, every top level script must begin with the following two lines:
-
-    import sys,os
-    sys.path.append(os.path.split(__file__)[0])
-
-
-## ```session_template``` folder
-
-The default installation contains a folder called ```session_template``` which should can be copied to create a new session. This contains at least the following files:
-
-    ciao_config.py
-    script_initialize.py
-    script_make_mask.py
-    script_record_reference_coordinates.py
-    ui_ciao.py
-    
-1. ```ciao_config.py``` is the session's configuration file, containing all of the parameters of the session's system, either real or simulated.
-2. ```script_initialize.py``` is used to initialize a session--to create the required folders and assist in creating other calibration files.
-3. ```script_make_mask.py``` is used to generate mask files for the SHWS and DM (see "Creating mask files" below).
-4. ```script_record_initial_reference_coordinates.py``` is used to generate ballpark reference coordinates which can then be used to bootstrap precise reference coordinates. The problem is that we need search boxes before we can compute the centroids of reference beam spots, but we need centroids of the reference beam spots in order to position search boxes. This script attempts to guess the initial locations of search boxes based on the spots image, and permits a bit of interactive adjustment of those coordinates.
-5. ```ui_ciao.py``` launches the closed-loop GUI.
-
-## Local sessions
-
-By default, any session whose name begins with ```local_session_``` will not be pushed into or pulled from the Git repository. This is a convenient way to guard against accidental collisions between local sessions and those stored in the repo.
 
 ## Creating a session
 
