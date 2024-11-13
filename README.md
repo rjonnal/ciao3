@@ -1,17 +1,69 @@
 # CIAO: community-inspired adaptive optics
 Python tools for controlling, simulating, and characterizing adaptive optics (AO) systems
 
-# Setup and installation
+## Quick start--running the simulator session
 
-## Prerequisites for minimal installation
+### Prerequisites for minimal installation
 
 These are the prerequisites for installing a version of the software which allows it to be run in simulation mode.
 
 1. Install [emacs](https://www.gnu.org/software/emacs/), [Notepad++](https://notepad-plus-plus.org/download), or another editor.
 2. Install [Git](https://git-scm.com/download/)
 3. Install [Anaconda for Python 3.X+](https://www.anaconda.com/download#downloads)
-4. If you're using Windows, install the [Visual C++ compiler for Python](https://wiki.python.org/moin/WindowsCompilers). Make sure you get the right version for your Anaconda Python install. In Linux, gcc will be invoked instead; it's probably already installed on your system, but you can verify that it is with ```gcc --version```.
-5. If necessary, create a directory where your Python libraries will reside, and add that directory to the environment variable `PYTHONPATH`. Clone this repository into that directory: `git clone https://github.com/rjonnal/ciao3`. In our lab we use the locations `C:\code` (Windows) and `/home/USER/code` (Linux) as a rule.
+4. If you're using Windows, install the [Visual C++ compiler for Python](https://wiki.python.org/moin/WindowsCompilers). Make sure you get the right version for your Anaconda Python install. In Linux/Mac, gcc will be invoked instead; it's probably already installed on your system, but you can verify that it is with ```gcc --version```.
+5. If necessary, create a directory where your Python libraries will reside, and add that directory to the environment variable `PYTHONPATH`. 
+6. Clone this repository into the directory specified by `PYTHONPATH` by navigating to that directory in a terminal and typing: `git clone https://github.com/rjonnal/ciao3`. In our lab we use the locations `C:\code` (Windows) and `/home/USER/code` (Linux) as a rule.
+7. If `git clone` doesn't work, you can download CIAO as a [zip file](https://github.com/rjonnal/ciao3/archive/refs/heads/main.zip) instead, but you should really try to get `git` to work.
+
+### Anaconda prompt
+
+Anaconda comes with a terminal emulator called "Anaconda prompt", which permits you to call any system commands (i.e. commands availalbe using the built-in Windows prompt) as well as Anaconda-specific commands (e.g., ```conda```) without having to modify your system path. In Windows it is the simplest way to interact with CIAO. It is assumed that you have basic familiarity with the command-line interface (CLI) of your operating system. Thus, specific syntax for copying files or folders or executing commands is omitted from this guide, in favor of platform-neutral descriptive instructions.
+
+If you are using Windows, it is highly recommended that you install common Linux/Mac CLI tools using `conda install m2-base`. The Windows versions of these CLI tools are bizarre and inconvenient.
+
+### Installation of required Python libraries
+
+The instructions below contain minimal instructions for getting started with a CIAO simulation session. If you are new to Anaconda or Miniconda, please read [this introduction](https://docs.conda.io/projects/conda/en/23.3.x/user-guide/getting-started.html).
+
+1. Create a `ciao` virtual environment in Anaconda. At the conda terminal, type: `conda create --name ciao3 python=3.12`. We are installing version 3.12 because it's the last version of Python tested against. CIAO will probably run on newer versions of Python too.
+
+2. Activate the `ciao3` environment: `conda activate ciao3`. You will have to activate this environment any time you want to run CIAO or its components.
+
+3. Verify Python version in the `ciao3` environment: `python --version`.
+
+4. CIAO depends on the following conda packages:
+    ```
+	matplotlib
+	numpy
+	scipy
+	psutil
+	cython
+	pandas
+    ```
+5. These can be installed with separate calls to `conda install PACKAGE`, or using the supplied environment YAML file: from `ciao3/` issue: `conda env create -f ciao3_environment.yml`. The latter will read the YAML file at from the `ciao3/` folder and install the required packages.
+
+### Compiling the centroiding algorithm
+
+As of now, the only real-time algorithm that is substantially slower in pure Python than compiled C is the background-estimation and center-of-mass calculation. Almost everything in CIAO could be written in Python using the Numpy library, with adequate performance for typical AO loops (20-30 Hz). However, in the interest of speeding things up, the costliest operation--centroiding the spots in the Shack-Hartmann image--has been moved down into a C-extension written using Cython[Cython](https://cython.readthedocs.io/en/latest/). 
+
+Cython is a superset of Python with some additional features including, most importantly, static typing. After Cython programs are written, they are compiled into machine code. The compiled machine code programs have extensions `.so` (for 'shared object', in Linux) and `.pyd` (in Windows, similar to a DLL file). Both are dynamically linked libraries, i.e., libraries whose functions are called by other programs, as opposed to libraries whose functions are compiled into other programs. To the Python programmer, an `.so` or `.pyd` file behaves just like a `.py` file; you can import it, import from it, etc.
+
+In a perfect world, installation of a C compiler such as gcc or Visual C++ compiler combined with installation of cython via conda (as described above) will just make Cython work correctly.
+
+To compile the Cython code, navigate to the ```ciao3/components/centroid_cython``` folder and issue the following command: `python setup.py build_ext --inplace`.
+
+You may see some warnings (e.g. about deprecation of Numpy features), but shouldn't see any errors. After that, copy the new `.so` or `.pyd` file into the `ciao3/components/` folder and rename it `centroid.so` or `centroid.pyd`.
+
+The `bash` programs `rebuild.sh` and `cleanup.sh` can be used on Linux systems. Windows users can look at these simple scripts to see what they do. Just remember that on Windows the compiled linked library has the extension `.pyd`, and this must be renamed/moved to `ciao3/components/centroid.pyd`.
+
+### Copying the template session folder and running the UI
+
+Next, navigate to `ciao3/` and copy/rename the `session_template_simulator_256`, creating a local version `local_session_simulator_256`. In Linux: `cp -rvf session_template_simulator_256 local_session_simulator_256`.
+
+Then, navigate to the local session folder: `cd local_session_simulator_256`.
+
+Then, run the simulator UI: `python ui_ciao.py`.
+
 
 ## Sessions
 
@@ -46,94 +98,41 @@ The default installation contains several folders called ```session_template_XXX
 
 By default, any session whose name begins with ```local_session_``` will not be pushed into or pulled from the Git repository. This is a convenient way to guard against accidental collisions between local sessions and those stored in the repo.
 
+## Quick start--making a session from scratch
 
-## Quick start
+If you have succesfully completed the **Quick start--running the simulator session** steps above, following this recipe should allow you to get a custom simulator up and running quickly.
 
-### Installation of required Python libraries
-
-The instructions below contain minimal instructions for getting started with a CIAO simulation session. If you are new to Anaconda or Miniconda, please read [this introduction](https://docs.conda.io/projects/conda/en/23.3.x/user-guide/getting-started.html).
-
-1. Create a `ciao` virtual environment in Anaconda. At the conda terminal, type: `conda create --name ciao3 python=3.12`. We are installing version 3.12 because it's the last version of Python tested against. CIAO will probably run on newer versions of Python too.
-
-2. Activate the `ciao3` environment: `conda activate ciao3`. You will have to activate this environment any time you want to run CIAO or its components.
-
-3. Verify Python version in the `ciao3` environment: `python --version`.
-
-4. CIAO depends on the following conda packages:
-    ```
-	matplotlib
-	numpy
-	scipy
-	psutil
-	cython
-    ```
-
-### Compiling the centroiding algorithm
-
-As of now, the only real-time algorithm that is substantially slower in pure Python than compiled C is the background-estimation and center-of-mass calculation. Almost everything in CIAO could be written in Python using the Numpy library, with adequate performance for typical AO loops (20-30 Hz). However, in the interest of speeding things up, the costliest operation--centroiding the spots in the Shack-Hartmann image--has been moved down into a C-extension written using Cython[Cython](https://cython.readthedocs.io/en/latest/). In a perfect world, installation of a C compiler such as gcc or Visual C++ compiler combined with installation of cython via conda (as described above) will just make Cython work correctly.
-
-To compile the Cython code, navigate to the ```ciao3/components/centroid_cython``` folder and issue the following command: `python setup.py build_ext --inplace`.
-
-You may see some warnings (e.g. about deprecation of Numpy features), but shouldn't see any errors. After that, copy the new `.so` or `.pyd` file into the `ciao/components/` folder and rename it `centroid.so` or `centroid.pyd`.
-
-
-
-
-To compile the
-
-
-These prerequisites assume you are using the default hardware (Alpao mirror and a SHWS based on a Basler Ace USB3 camera).
-
-## Additional prerequisites for UC Davis hardware loop implementation
-
-1. Install Alpao drivers
-
-## Anaconda prompt
-
-Anaconda comes with a terminal emulator called "Anaconda prompt", which permits you to call any system commands (i.e. commands availalbe using the built-in Windows prompt) as well as Anaconda-specific commands (e.g., ```conda```) without having to modify your system path. In Windows it is the simplest way to interact with CIAO. It is assumed that you have basic familiarity with the command-line interface (CLI) of your operating system. Thus, specific syntax for copying files or folders or executing commands is omitted from this guide, in favor of platform-neutral descriptive instructions.
-
-## Compiling C extensions for centroiding
-
-Almost everything in CIAO could be written in Python using the Numpy library, with adequate performance for typical AO loops (20-30 Hz). However, in the interest of speeding things up, the costliest operation--centroiding the spots in the Shack-Hartmann image--has been moved down into a C-extension written using Cython. Depending on your OS and hardware, the precompiled binaries (```centroid.so``` and ```centroid.pyd```) may work out of the box. However, the safest thing to do is recompile the Cython code. To do this, navigate to the ```ciao/components/centroid``` folder and issue the following command:
-
-    python setup.py build_ext --inplace
-    
-You may see some warnings (e.g. about deprecation of Numpy features), but shouldn't see any errors. After that, copy the new `.so` or `.pyd` file into the `ciao/components/` folder and rename it `centroid.so` or `centroid.pyd`.
-
-# Quick start
-
-If you have succesfully completed the "Setup and installation" steps above, following this recipe should allow you to get a simulator up and running quickly.
-
-1. Navigate into the ```ciao``` directory and make a copy of ```session_template``` and name it ```local_session_simulator_256```.
-2. Navigate into ```local_session_simulator_256``` and issue ```python script_initialize.py```.
-3. Create a mirror mask by issuing ```python script_make_mask.py 11 5.5 ./etc/dm/mirror_mask.txt```.
+1. Navigate into the ```ciao``` directory and make a copy of ```session_template``` and name it ```local_session_XXXX```.
+2. Navigate into ```local_session_XXXX``` and issue ```python script_initialize.py```.
+3. Create a mirror mask by issuing ```python script_make_mask.py 11 5.5 ./etc/dm/mirror_mask.txt```. These numbers represent the logical width of the mirror mask file and logical radius of the mirror. You may alter them as you wish.
 4. Issue ```python script_initialize.py``` again, and type 'Y' and press enter, to create an all-zero flat file.
-5. Create a SHWS mask by issuing ```python script_make_mask.py 20 9.6 ./etc/ref/reference_mask.txt```.
+5. Create a SHWS mask by issuing ```python script_make_mask.py 20 9.6 ./etc/ref/reference_mask.txt```. These numbers represent the logical width of the reference mask file and the logical radius of the reference mask.
 6. Optional: issue ```python script_make_beeps.py``` to generate the WAV files for audio feedback.
-7. Edit ```local_session_simulator_256/ciao_config.py```. Ensure that each of the following parameters are set as described below:
+7. Edit ```local_session_XXXX/ciao_config.py```. Ensure that each of the following parameters are set correctly. Some example values are shown below:
 
-        simulate = True
-        system_id = 'simulator'
-        mirror_id = 'simulator'
-        camera_id = 'simulator'
-        image_width_px = 256
-        image_height_px = 256
-        lenslet_pitch_m = 500e-6
-        lenslet_focal_length_m = 20.0e-3
-        pixel_size_m = 40e-6
-        beam_diameter_m = 10e-3
-        search_box_half_width = 5
-        iterative_centroiding_step = 2
-        centroiding_iterations = 2
-        mirror_n_actuators = 97
-
+	```
+	simulate = True
+	system_id = 'simulator'
+	mirror_id = 'simulator'
+	camera_id = 'simulator'
+	image_width_px = 256
+	image_height_px = 256
+	lenslet_pitch_m = 500e-6
+	lenslet_focal_length_m = 20.0e-3
+	pixel_size_m = 40e-6
+	beam_diameter_m = 10e-3
+	search_box_half_width = 5
+	iterative_centroiding_step = 2
+	centroiding_iterations = 2
+	mirror_n_actuators = 97
+	```
 8. Issue ```python script_record_initial_reference_coordinates.py etc/ref/reference_initial.txt``` to create bootstrapping reference coordinates. Follow the instructions in the terminal and use the resulting plots to refine these coordinates.
 9. Issue ```python ui_ciao.py```. The UI should appear.
 10. Click **Pseudocalibrate** a few times. The first time you do this it will take a few minutes. The slowest step is generating a simulated/theoretical spots image that is required for determining the ideal location of the reference coordinates.
 11. Click **Measure poke matrix** and wait for the poke matrix to be measured.
 12. Click **Loop closed**.
 
-# Calibration using a planar wavefront
+## Calibration using a planar wavefront [UNDER REVIEW]
 
 If you have a planar reference wavefront incident on the SHWS and would like to use it to calibrate the reference coordinates, do the following:
 
@@ -147,11 +146,9 @@ If you have a planar reference wavefront incident on the SHWS and would like to 
 8. If necessary, adjust tip and tilt of the reference beam to center them in the existing search boxes as well as possible. This is a good thing to do because the reference coordinates are most accurately recorded when the spots are centered, since the impact of background estimation error is minimized. **The planar beam's tip and tilt should not be adjusted using any optical elements shared by the planar reference beam and the model eye beam**, since it's critical at this stage not to affect the model eye (or real eye) spot locations.
 9. Click **Record Reference**. This will alter the real time reference coordinates as well as the ```etc/ref/reference.txt``` file, such that subsequent runs of ```ui_ciao.py``` will use the newly recorded reference.
 
-# Slow start
+## Slow start
 
-
-
-## Creating a session
+### Creating a session
 
 The quickest way to create a session is to use ```script_initialize.py```. After creating a copy of ```session_template```, rename it something descriptive starting with ```local_session_```, enter the directory and issue the following command:
 
@@ -177,7 +174,7 @@ This will create the following directory structure in your session directory.
     
 It will also prompt you to create mask files, reference coordinates, etc.
 
-## Creating mask files
+### Creating mask files
 
 The reference mask is a two-dimensional arrays of zeros and ones which specifies which of the Shack-Hartmann lenslets to use. The mirror mask specifies, similarly, the logical locations of active mirror actuators. For most deformable mirrors, there is no ambiguity about which locations should be ones and which should be zeros. For the ALPAO 97-actuator mirrors, for instance, the correct mask is generated by the command: 
 
@@ -219,7 +216,7 @@ The latter problem arises when defining a mask for the locations of active SHWS 
 
 Masks for the mirror and Shack-Hartmann lenslet array must be created, and copied into the ```etc/dm``` and ```etc/ref``` directories. This step is covered above in **Creating a session**.
 
-## Creating a reference coordinate file
+### Creating a reference coordinate file
 
 The reference coordinates are the (x,y) locations on the sensor, in pixel units, where spots are expected to fall when a planar wavefront is incident on the sensor. These are the coordinates with which the boundaries of the search boxes are defined, and the coordinates with which the local slope of the wavefront is computed, used to drive the mirror in closed loop or to reconstruct the wavefront and measure wavefront error.
 
@@ -235,7 +232,7 @@ Several approaches have been used to generate these coordinates, but a common ap
 
 4. Click **```Record reference```**. This may need to be done more than once, because background noise in a search box that's not centered at the spot's center of mass causes a bias toward the reference coordinates, i.e. an underestimate of error. The residual wavefront error RMS may be used to verify that the coordinates have been recorded correctly, since apparent error due to shot noise will eventually reach a stable minimum. Typically this value should be $\leq 10\;nm$.
 
-## Design principles
+### Design principles
 
 0. **Balance exploratory/educational goals with real-time goals**. This software is intended to be neither the highest-performance AO software nor the most [literate](https://en.wikipedia.org/wiki/Literate_programming), but to balance both goals. This is hard to achieve, and requires judgement calls, but some examples:
 
@@ -267,14 +264,18 @@ Several approaches have been used to generate these coordinates, but a common ap
 
 2. Install [pypylon](https://github.com/basler/pypylon/releases/download/1.4.0/pypylon-1.4.0-cp27-cp27m-win_amd64.whl). First download, then use 'pip install pypylon...amd64.whl'.
 
+### IDS UEYE cameras
 
-# Design considerations
+1. Install [UEYE](https://www.ids-imaging.us/downloads.html?gad_source=1&gclid=Cj0KCQiAlsy5BhDeARIsABRc6ZtTxhOhyqbUeWjh0gVq_kP4N5pw2W3b3Ahuyl-SKVLPt5IYdxAFoVkaAi_7EALw_wcB) for your operating system.
+2. Install [pyueye](https://pypi.org/project/pyueye/) via pip: `pip install pyueye`. Make sure you're in the `ciao3` environment first, with `conda activate ciao3`.
 
-## Installing mulitple instances of CIAO
+## Design considerations
+
+### Installing mulitple instances of CIAO
 
 One probably common use case for CIAO is having multiple "installations" or "versions" of the software to, for instance, be able to run a simulator with a low resolution, computationally fast beam, and then a real hardware-based loop or wavefront sensor. There are many ways to do this, some of which are listed below.
 
-1. **Virtual environments**. These can be created using popular scientific Python distributions such as Anaconda or Enthought Python Distribution, or through the use of the ```virtualenv``` package. Advantages: the most *Pythonic* solution; enables multiple CIAOs; prevents other problems such as conflicts with pre-existing Python installations used for other purposes on the same computer. Disadvantages: requires moderate expertise on the topic of virtual environments; could cause major issues for novice developers.
+1. **Virtual environments**. These can be created using popular scientific Python distributions such as Anaconda or Enthought Python Distribution, or through the use of the ```virtualenv``` package. Advantages: the most *Pythonic* solution; enables multiple CIAOs; prevents other problems such as conflicts with pre-existing Python installations used for other purposes on the same computer. Disadvantages: requires management of virtual environments; requires multiple installations of Python scientific stack (numpy, scipy, etc.).
 
 2. **Configure once**. In this approach, the config file would be loaded just once and, because imported modules are objects, passed as a required parameter for instantiating any subsequent CIAO objects. Advantages: allows easy reconfiguration at runtime and, thus, a simple way to programatically explore parameter space; this is the approach [advocated by Python Software Foundation Fellow, Alex Martelli](https://stackoverflow.com/questions/2348927/python-single-configuration-file/2348941); avoids potential collisions of conflicting ```ciao_config.py``` files--a problem that could be extremely difficult to debug. Disadvantages: requires the same object to be propagated through the entire instantiation hierarchy, leading to ugly/mystifying signatures for every class's constructor.
 
@@ -284,11 +285,12 @@ One probably common use case for CIAO is having multiple "installations" or "ver
 
 5. **Sessions**. Create folders with all top-level CIAO scripts and a single ```ciao_config.py``` in each. Advantages: once it's set up correctly you can forget about it; obviates confusing code in most of CIAO code base. Disadvantages: requires all scripts to live in the same directory as the config file; requires every script to modify ```sys.path``` at the very top, adding the session directory so that the only ```ciao_config.py``` file visible to any CIAO object is the session's. This is the approach I've selected, because it prioritizes ease of use, at the slight expense of transparency and flexibility.
 
-
-
-# Topics for conversation
+## Topics for conversation
 
 1. Other than condition number, what algorithmic or numerical tests can be employed to predict the performance of a given poke/control matrix?
 
 2. What rules of thumb should be employed when deciding whether a spot should be used? Put differently, how should one choose ```rad``` when generating a SHWS mask, as described above?
 
+3. What is the optimal procedure for calibrating using a planar reference beam, the `pseudocalibrate` function, and the `record reference` function?
+
+4. What the heck is going on with tip and tilt, man?
