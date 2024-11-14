@@ -351,6 +351,9 @@ class Reconstructor:
         refy = refy*self.pixel_size/(self.pupil_size/2.0)
         refy = refy-refy.mean()
 
+        self.refx = refx
+        self.refy = refy
+        
         # compute dx and dh for some n,m pairs for first n_terms terms:
         # build these up into matrices for inversion
         dxmat = []
