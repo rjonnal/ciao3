@@ -601,6 +601,9 @@ class UI(QWidget):
         self.cb_logging.stateChanged.connect(self.loop.sensor.set_logging)
         self.cb_logging.stateChanged.connect(self.loop.mirror.set_logging)
 
+        self.pb_snapshot = QPushButton('Snapshot')
+        self.pb_snapshot.clicked.connect(self.loop.snapshot)
+
         self.pb_save_buffer = QPushButton('Save slopes')
         self.pb_save_buffer.clicked.connect(self.loop.buf.save)
         
@@ -902,6 +905,7 @@ class UI(QWidget):
         logging_layout.addWidget(self.cb_logging)
         logging_layout.addWidget(self.pb_clear_buffer)
         logging_layout.addWidget(self.pb_save_buffer)
+        logging_layout.addWidget(self.pb_snapshot)
 
         column_2.addLayout(logging_layout)
         layout.addLayout(column_2,0,6,3,1)

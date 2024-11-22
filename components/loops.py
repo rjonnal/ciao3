@@ -27,6 +27,18 @@ from .reference_generator import ReferenceGenerator
 import ciao_config as ccfg
 from .frame_timer import FrameTimer,BlockTimer
 from .poke import Poke
+import json
+
+def load_dict(fn):
+    with open(fn,'r') as fid:
+        s = fid.read()
+        d = json.loads(s)
+    return d
+
+def save_dict(fn,d):
+    s = json.dumps(d)
+    with open(fn,'w') as fid:
+        fid.write(s)
 
 class DataBuffer:
 
@@ -455,6 +467,31 @@ class Loop(QObject):
 
     def set_closed(self,val):
         self.closed = val
+
+    def snapshot(self):
+        os.makedirs('snapshots',exist_ok=True)
+        now = now_string()
+        np.save(os.path.join('snapshots','%s_spots.npy'%now),self.sensor.image)
+        arr = np.array([self.sensor.search_boxes.x,
+                        self.sensor.search_boxes.y,
+                        self.sensor.box_backgrounds,
+                        self.sensor.x_slopes,
+                        self.sensor.y_slopes]).T
+        df = pd.DataFrame(arr)
+        df.columns = ['x_ref','y_ref','background','x_slopes','y_slopes']
+        df.to_csv(os.path.join('snapshots','%s_data.csv'%now))
+        
+        d = {}
+        d['sb_half_width'] = self.sensor.centroiding_half_width
+        d['tilt'] = self.sensor.tilt
+        d['tip'] = self.sensor.tip
+        d['remove_tip_tilt'] = self.sensor.remove_tip_tilt
+        d['centroiding_iterations'] = self.sensor.centroiding_iterations
+        d['iterative_centroiding_step'] = self.sensor.iterative_centroiding_step
+
+        save_dict(os.path.join('snapshots','%s_params.json'%now),d)
+        
+        
 
 
 class SerialLoop(QObject):
