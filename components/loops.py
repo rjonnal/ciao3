@@ -488,6 +488,8 @@ class Loop(QObject):
         d['remove_tip_tilt'] = self.sensor.remove_tip_tilt
         d['centroiding_iterations'] = self.sensor.centroiding_iterations
         d['iterative_centroiding_step'] = self.sensor.iterative_centroiding_step
+        d['pixel_size'] = self.sensor.pixel_size_m
+        d['focal_length'] = self.sensor.lenslet_focal_length_m
 
         save_dict(os.path.join('snapshots','%s_params.json'%now),d)
         
