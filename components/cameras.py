@@ -72,54 +72,57 @@ class PylonCamera:
 
 
 class UeyeCamera:
-    _is_SetExposureTime = ueye._bind("is_SetExposureTime",
-                                     [ueye.ctypes.c_uint, ueye.ctypes.c_double,
-                                      ueye.ctypes.POINTER(ueye.ctypes.c_double)], ueye.ctypes.c_int)
-    IS_GET_EXPOSURE_TIME = 0x8000
+    try:
+        _is_SetExposureTime = ueye._bind("is_SetExposureTime",
+                                         [ueye.ctypes.c_uint, ueye.ctypes.c_double,
+                                          ueye.ctypes.POINTER(ueye.ctypes.c_double)], ueye.ctypes.c_int)
+        IS_GET_EXPOSURE_TIME = 0x8000
 
-    @staticmethod
-    def is_SetExposureTime(hCam, EXP, newEXP):
-        """
-        Description
+        @staticmethod
+        def is_SetExposureTime(hCam, EXP, newEXP):
+            """
+            Description
 
-        The function is_SetExposureTime() sets the with EXP indicated exposure time in ms. Since this
-        is adjustable only in multiples of the time, a line needs, the actually used time can deviate from
-        the desired value.
+            The function is_SetExposureTime() sets the with EXP indicated exposure time in ms. Since this
+            is adjustable only in multiples of the time, a line needs, the actually used time can deviate from
+            the desired value.
 
-        The actual duration adjusted after the call of this function is readout with the parameter newEXP.
-        By changing the window size or the readout timing (pixel clock) the exposure time set before is changed also.
-        Therefore is_SetExposureTime() must be called again thereafter.
+            The actual duration adjusted after the call of this function is readout with the parameter newEXP.
+            By changing the window size or the readout timing (pixel clock) the exposure time set before is changed also.
+            Therefore is_SetExposureTime() must be called again thereafter.
 
-        Exposure-time interacting functions:
-            - is_SetImageSize()
-            - is_SetPixelClock()
-            - is_SetFrameRate() (only if the new image time will be shorter than the exposure time)
+            Exposure-time interacting functions:
+                - is_SetImageSize()
+                - is_SetPixelClock()
+                - is_SetFrameRate() (only if the new image time will be shorter than the exposure time)
 
-        Which minimum and maximum values are possible and the dependence of the individual
-        sensors is explained in detail in the description to the uEye timing.
+            Which minimum and maximum values are possible and the dependence of the individual
+            sensors is explained in detail in the description to the uEye timing.
 
-        Depending on the time of the change of the exposure time this affects only with the recording of
-        the next image.
+            Depending on the time of the change of the exposure time this affects only with the recording of
+            the next image.
 
-        :param hCam: c_uint (aka c-type: HIDS)
-        :param EXP: c_double (aka c-type: DOUBLE) - New desired exposure-time.
-        :param newEXP: c_double (aka c-type: double *) - Actual exposure time.
-        :returns: IS_SUCCESS, IS_NO_SUCCESS
+            :param hCam: c_uint (aka c-type: HIDS)
+            :param EXP: c_double (aka c-type: DOUBLE) - New desired exposure-time.
+            :param newEXP: c_double (aka c-type: double *) - Actual exposure time.
+            :returns: IS_SUCCESS, IS_NO_SUCCESS
 
-        Notes for EXP values:
+            Notes for EXP values:
 
-        - IS_GET_EXPOSURE_TIME Returns the actual exposure-time through parameter newEXP.
-        - If EXP = 0.0 is passed, an exposure time of (1/frame rate) is used.
-        - IS_GET_DEFAULT_EXPOSURE Returns the default exposure time newEXP Actual exposure time
-        - IS_SET_ENABLE_AUTO_SHUTTER : activates the AutoExposure functionality.
-          Setting a value will deactivate the functionality.
-          (see also 4.86 is_SetAutoParameter).
-        """
-        _hCam = ueye._value_cast(hCam, ueye.ctypes.c_uint)
-        _EXP = ueye._value_cast(EXP, ueye.ctypes.c_double)
-        ret = UeyeCamera._is_SetExposureTime(_hCam, _EXP, ueye.ctypes.byref(newEXP) if newEXP is not None else None)
-        return ret
-
+            - IS_GET_EXPOSURE_TIME Returns the actual exposure-time through parameter newEXP.
+            - If EXP = 0.0 is passed, an exposure time of (1/frame rate) is used.
+            - IS_GET_DEFAULT_EXPOSURE Returns the default exposure time newEXP Actual exposure time
+            - IS_SET_ENABLE_AUTO_SHUTTER : activates the AutoExposure functionality.
+              Setting a value will deactivate the functionality.
+              (see also 4.86 is_SetAutoParameter).
+            """
+            _hCam = ueye._value_cast(hCam, ueye.ctypes.c_uint)
+            _EXP = ueye._value_cast(EXP, ueye.ctypes.c_double)
+            ret = UeyeCamera._is_SetExposureTime(_hCam, _EXP, ueye.ctypes.byref(newEXP) if newEXP is not None else None)
+            return ret
+    except NameError as ne:
+        print(ne)
+        
     def __init__(self, selector=''):
         self.hCam = ueye.HIDS(0)  # 0: first available camera;  1-254: The camera with the specified camera ID
         self.sInfo = ueye.SENSORINFO()

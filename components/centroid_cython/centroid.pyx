@@ -67,31 +67,31 @@ cpdef compute_centroids(np.ndarray[np.int16_t,ndim=2] spots_image,
                         num_threads_p = 1):
 
 
-    cdef np.int_t n_spots = len(sb_x_vec)
-    cdef np.int_t num_threads = int(num_threads_p)
-    cdef np.int_t iterations = int(iterations_p)
-    cdef np.int_t iteration_step_px = int(iteration_step_px_p)
-    cdef np.int_t sb_half_width = int(sb_half_width_p)
+    cdef np.int64_t n_spots = len(sb_x_vec)
+    cdef np.int64_t num_threads = int(num_threads_p)
+    cdef np.int64_t iterations = int(iterations_p)
+    cdef np.int64_t iteration_step_px = int(iteration_step_px_p)
+    cdef np.int64_t sb_half_width = int(sb_half_width_p)
 
     cdef np.float_t intensity
     cdef np.float_t background
     cdef np.float_t xprod
     cdef np.float_t yprod
-    cdef np.int_t x
-    cdef np.int_t x1
-    cdef np.int_t x2
-    cdef np.int_t y
-    cdef np.int_t y1
-    cdef np.int_t y2
-    cdef np.int_t sy
-    cdef np.int_t sx
-    cdef np.int_t half_width
+    cdef np.int64_t x
+    cdef np.int64_t x1
+    cdef np.int64_t x2
+    cdef np.int64_t y
+    cdef np.int64_t y1
+    cdef np.int64_t y2
+    cdef np.int64_t sy
+    cdef np.int64_t sx
+    cdef np.int64_t half_width
     cdef np.float_t imax
     cdef np.float_t imin
     cdef np.float_t pixel
     cdef np.float_t counter
-    cdef np.int_t k_iteration
-    cdef np.int_t k_spot
+    cdef np.int64_t k_iteration
+    cdef np.int64_t k_spot
 
     sy = spots_image.shape[0]
     sx = spots_image.shape[1]
@@ -180,20 +180,20 @@ cpdef estimate_backgrounds(np.ndarray[np.int16_t,ndim=2] spots_image,
                            np.ndarray[np.float_t,ndim=1] sb_bg_vec,
                            sb_half_width_p):
 
-    cdef np.int_t n_spots = len(sb_x_vec)
-    cdef np.int_t sb_half_width = int(sb_half_width_p)
+    cdef np.int64_t n_spots = len(sb_x_vec)
+    cdef np.int64_t sb_half_width = int(sb_half_width_p)
 
     cdef np.float_t intensity
-    cdef np.int_t x
-    cdef np.int_t x1
-    cdef np.int_t x2
-    cdef np.int_t y
-    cdef np.int_t y1
-    cdef np.int_t y2
-    cdef np.int_t sy
-    cdef np.int_t sx
+    cdef np.int64_t x
+    cdef np.int64_t x1
+    cdef np.int64_t x2
+    cdef np.int64_t y
+    cdef np.int64_t y1
+    cdef np.int64_t y2
+    cdef np.int64_t sy
+    cdef np.int64_t sx
     cdef np.float_t counter
-    cdef np.int_t k_spot
+    cdef np.int64_t k_spot
 
     sy = spots_image.shape[0]
     sx = spots_image.shape[1]
