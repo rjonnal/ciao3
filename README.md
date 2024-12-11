@@ -44,7 +44,7 @@ The instructions below contain minimal instructions for getting started with a C
 
 ### Compiling the centroiding algorithm
 
-As of now, the only real-time algorithm that is substantially slower in pure Python than compiled C is the background-estimation and center-of-mass calculation. Almost everything in CIAO could be written in Python using the Numpy library, with adequate performance for typical AO loops (20-30 Hz). However, in the interest of speeding things up, the costliest operation--centroiding the spots in the Shack-Hartmann image--has been moved down into a C-extension written using Cython[Cython](https://cython.readthedocs.io/en/latest/). 
+As of now, the only real-time algorithm that is substantially slower in pure Python than compiled C is the background-estimation and center-of-mass calculation. Almost everything in CIAO could be written in Python using the Numpy library, with adequate performance for typical AO loops (20-30 Hz). However, in the interest of speeding things up, the costliest operation--centroiding the spots in the Shack-Hartmann image--has been moved down into a C-extension written using [Cython](https://cython.readthedocs.io/en/latest/). 
 
 Cython is a superset of Python with some additional features including, most importantly, static typing. After Cython programs are written, they are compiled into machine code. The compiled machine code programs have extensions `.so` (for 'shared object', in Linux) and `.pyd` (in Windows, similar to a DLL file). Both are dynamically linked libraries, i.e., libraries whose functions are called by other programs, as opposed to libraries whose functions are compiled into other programs. To the Python programmer, an `.so` or `.pyd` file behaves just like a `.py` file; you can import it, import from it, etc.
 
@@ -52,7 +52,7 @@ In a perfect world, installation of a C compiler such as gcc or Visual C++ compi
 
 To compile the Cython code, navigate to the ```ciao3/components/centroid_cython``` folder and issue the following command: `python setup.py build_ext --inplace`.
 
-You may see some warnings (e.g. about deprecation of Numpy features), but shouldn't see any errors. After that, copy the new `.so` or `.pyd` file into the `ciao3/components/` folder and rename it `centroid.so` or `centroid.pyd`.
+You may see some warnings (e.g. about deprecation of Numpy features), but shouldn't see any errors. After that, copy the new `.so` or `.pyd` file into the `ciao3/components/` folder and rename it `centroid.so` (Linux) or `centroid.pyd` (Windows).
 
 The `bash` programs `rebuild.sh` and `cleanup.sh` can be used on Linux systems. Windows users can look at these simple scripts to see what they do. Just remember that on Windows the compiled linked library has the extension `.pyd`, and this must be renamed/moved to `ciao3/components/centroid.pyd`.
 
